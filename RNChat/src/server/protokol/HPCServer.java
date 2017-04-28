@@ -59,7 +59,7 @@ public class HPCServer implements Runnable {
 	private int headerErrorCount = 0;
 	private int headerErrorMaxCount = 3;
 
-	private OutputStreamThread outputThread;
+	private OutputStreamThread<Message> outputThread;
 
 	public HPCServer(Socket socket) {
 

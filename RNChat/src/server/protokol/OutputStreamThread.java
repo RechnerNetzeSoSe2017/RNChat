@@ -5,9 +5,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import server.util.message.Message;
 
-public class OutputStreamThread extends Thread {
+public class OutputStreamThread<E> extends Thread {
 
-	private LinkedBlockingQueue<Message> output = new LinkedBlockingQueue<>();
+	private LinkedBlockingQueue<E> output = new LinkedBlockingQueue<>();
 	private PrintWriter out = null;
 	private boolean shutdown = false;
 	
@@ -23,7 +23,7 @@ public class OutputStreamThread extends Thread {
 	public void run() {
 		//liest aus der liste aus und sendet dann alles
 		
-		Message msg=null;
+		E msg=null;
 		
 		while(!shutdown){
 			
@@ -33,10 +33,12 @@ public class OutputStreamThread extends Thread {
 				// TODO Auto-generated catch block
 				//hier vielleicht die verbindnug beenden?
 				e.printStackTrace();
+				continue;
 			}
 			
-			out.println(msg);
-			
+			if(!shutdown){
+				out.println(msg);
+			}
 			
 		}
 		

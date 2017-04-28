@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import client.protocol.HCPClient;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -35,6 +37,23 @@ public class UIController implements Initializable{
 		instance=this;
 		
 		hcpClient=new HCPClient("127.0.0.1", 33333);
+		
+		hcpClient.start();
+		
+		
+		sendButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				String temp = inputArea.getText();
+				
+				hcpClient.sendMessage(temp, 0);
+				messageArea.appendText(temp);
+				
+				inputArea.setText("");
+				
+			}
+		});
 		
 		
 		

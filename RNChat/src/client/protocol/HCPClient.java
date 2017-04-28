@@ -46,7 +46,7 @@ public class HCPClient extends Thread {
 	private int clientID = 0;
 //	private LinkedBlockingQueue<E>
 	
-	private OutputStreamThread outputThread;
+	private OutputStreamThread<String> outputThread;
 	
 	
 	/**
@@ -103,19 +103,24 @@ public class HCPClient extends Thread {
 				readServerHeader();
 				
 				//dem server mitteilen das der client nun den header beendet hat..
-				out.println(befehlEOH);
-				
+//				out.println(befehlEOH);
+
 				
 				//ab hier ist wieder provisorisch...
 				outputThread = new OutputStreamThread(out, outputQueue);
+				outputThread.start();
 				
-				
+				while(!socket.isClosed()){
 				try {
 					log(in.readLine());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				}
+				
+				outputThread.stopSend();
+				
 				
 				
 				
