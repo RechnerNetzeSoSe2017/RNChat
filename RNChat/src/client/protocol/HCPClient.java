@@ -110,6 +110,13 @@ public class HCPClient extends Thread {
 				outputThread = new OutputStreamThread(out, outputQueue);
 				
 				
+				try {
+					log(in.readLine());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				
 				
 			}
