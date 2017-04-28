@@ -85,6 +85,7 @@ public class ChatSocketListener extends Thread{
 		}
 		
 		operationStatus=Serverstatus.RUNNING;
+		log("start Listening on Socket on Port "+portNr);
 		
 		while(listen){
 			Socket client = null;
@@ -92,7 +93,7 @@ public class ChatSocketListener extends Thread{
 			
 			try {
 				
-				log("start Listening on Socket on Port "+portNr);
+				
 				
 				
 				//es wird versucht eine neue verbindung einzugehen

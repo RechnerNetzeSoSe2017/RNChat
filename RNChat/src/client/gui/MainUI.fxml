@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.UIController">
+<AnchorPane prefHeight="591.0" prefWidth="716.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.UIController">
    <children>
-      <Pane prefHeight="200.0" prefWidth="200.0" />
+      <Pane layoutX="-2.0" prefHeight="591.0" prefWidth="716.0">
+         <children>
+            <TabPane fx:id="tabpane" layoutX="14.0" layoutY="51.0" prefHeight="507.0" prefWidth="688.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Untitled Tab 1">
+                     <content>
+                        <Pane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <TextArea fx:id="messageArea" layoutX="14.0" layoutY="14.0" prefHeight="352.0" prefWidth="554.0" />
+                              <Button fx:id="sendButton" layoutX="583.0" layoutY="392.0" mnemonicParsing="false" text="send" />
+                              <TextArea fx:id="inputArea" layoutX="14.0" layoutY="364.0" prefHeight="80.0" prefWidth="556.0" />
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+                <Tab text="Untitled Tab 2" />
+              </tabs>
+            </TabPane>
+         </children></Pane>
    </children>
 </AnchorPane>
