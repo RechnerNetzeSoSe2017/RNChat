@@ -7,6 +7,7 @@ private String payload="";
 	public PayloadControl(String message) {
 
 		super(message);
+		payload=message;
 	}
 	
 	@Override

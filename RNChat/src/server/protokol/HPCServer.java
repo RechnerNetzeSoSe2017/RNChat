@@ -6,15 +6,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javafx.util.Pair;
 import server.server.Chatserver;
 import server.util.IDGenerator;
 import server.util.message.Message;
+import server.util.message.PayloadControl;
 import server.util.message.PayloadMessage;
+import server.verteiler.Verteiler;
 
 /**
  * HPCS - HyperChatProtocolServer Die Serverseite des Chatprotokolls..
@@ -27,7 +32,8 @@ import server.util.message.PayloadMessage;
  */
 public class HPCServer implements Runnable {
 
-	private int id;
+	private int clientID;
+	private int serverID = 1;
 
 	private String protocolVersion = "1.0";
 
@@ -53,13 +59,42 @@ public class HPCServer implements Runnable {
 
 	private boolean closeConnection = false;
 
+	private String befehlsPraefix = "<";
+	private String befehlsSuffix = ">";
 	private String headerOKMessage = "<OK>";
 	private String headerNOKMessage = "<NOK>";
 	private String headerErrorMessage = "<ERROR>";
 	private int headerErrorCount = 0;
 	private int headerErrorMaxCount = 3;
+	private String payloadMessageTAG = "<message>";
+	private String payloadControlTAG = "<control>";
+	private String payloadControlChannelTAG = "<channel>";
+	private String payloadControlChannelCloseTAG = "</channel>";
+	private String subscribeTAG = "<subscribe>";
+	private String subscribeTAGClose = "</subscribe>";
+	private String unsubscribeTAG = "<unsubscribe>";
+	private String unsubscribeTAGClose = "</unsubscribe>";
+	private String listTAG = "<list>";
+	private String listTAGClose = "</list>";
+	private String idTAG = "<id>";
+	private String idTAGClose = "</id>";
+	private String nameTAG = "<name>";
+	private String nameTAGClose = "</name>";
+	private String nameserviceTAG = "<nameservice>";
+	private String nameserviceTAGClose = "</nameservice>";
+	private String nickTAG = "<nick>";
+	private String nickTAGClose = "</nick>";
 
 	private OutputStreamThread<Message> outputThread;
+	private InputStreamThread inputThread;
+
+	private Verteiler verteiler = Verteiler.getInstance("");
+
+	// erlaubt es dem client Nachrichten die er an sich selbst addressiert
+	// wieder zu empfangen.. nur für testzwecke
+	private static boolean loopback = true;
+	
+	private Locale lowercaseLocale = Locale.GERMANY;
 
 	public HPCServer(Socket socket) {
 
@@ -67,14 +102,14 @@ public class HPCServer implements Runnable {
 		// abgebrochen.
 		if (socket != null) {
 			this.socket = socket;
-			id = IDGenerator.getID();
+			clientID = IDGenerator.getID();
 		} else {
 			return;
 		}
-		log("starting communication with client id " + id + " from " + socket.getInetAddress());
+		log("starting communication with client id " + clientID + " from " + socket.getInetAddress());
 
 		// die optionen die voreingestellt werden
-		optionen.put(verkehrsModusName, CommunicationMode.FullDuplex.toString().toLowerCase());
+		optionen.put(verkehrsModusName, CommunicationMode.FullDuplex.toString().toLowerCase(lowercaseLocale));
 
 		// die Liste die alle möglichen Optionen beinhaltet
 		optionsListing.put(verkehrsModusName, CommunicationMode.FullDuplex.toString());
@@ -82,6 +117,10 @@ public class HPCServer implements Runnable {
 		// ein Testeintrag
 		optionsListing.put("Encryption", "NONE");
 
+	}
+
+	public static void setLoopback(boolean value) {
+		loopback = value;
 	}
 
 	private void log(String string) {
@@ -109,8 +148,9 @@ public class HPCServer implements Runnable {
 		}
 
 		try {
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF8"), buffersize);
-//			in = new BufferedReader(new InputStreamReader(socket.getInputStream()), buffersize);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF8"), buffersize);
+			// in = new BufferedReader(new
+			// InputStreamReader(socket.getInputStream()), buffersize);
 			out = new PrintWriter(socket.getOutputStream(), true);
 		} catch (IOException e) {
 			// TODO hier abbrechen, da hier keine reder oder writer geöffnet
@@ -126,7 +166,7 @@ public class HPCServer implements Runnable {
 		out.println("<Protokoll>HCP - HyperChatProtokoll " + protocolVersion);
 
 		// die ClientID
-		out.println("<ClientID>" + id);
+		out.println("<ClientID>" + clientID);
 
 		// Die größe der Nachricht
 		out.println("<MessageSize>" + buffersize);
@@ -148,30 +188,34 @@ public class HPCServer implements Runnable {
 
 			out.println("<OK>start message-format now!");
 
-			if (optionen.get(verkehrsModusName).equals(CommunicationMode.FullDuplex.toString().toLowerCase())) {
+			if (optionen.get(verkehrsModusName).equals(CommunicationMode.FullDuplex.toString().toLowerCase(lowercaseLocale))) {
 				fullDuplexCommunikation();
 			}
 		}
-		
-		//ab hier läuft die kommunikation über einen anderen thread und es kann begommen werden die Nachriichten aus der
+
+		// ab hier läuft die kommunikation über einen anderen thread und es kann
+		// begommen werden die Nachriichten aus der
 		// inputqueue zu verarbeiten.
-		
 
 	}
 
 	public void closeConnection() {
 		closeConnection = true;
 
-		log("closing connection with client " + id + " from " + socket.getInetAddress());
+		log("closing connection with client " + clientID + " from " + socket.getInetAddress());
 
 		// die ID muss wieder frei gemacht werden..
-		IDGenerator.freeID(id);
+		IDGenerator.freeID(clientID);
 
-		if(outputThread!=null){
-		// wenn modus vollduplex, dann die threads beenden
-		outputThread.stopSend();
-		output.add(new Message(1, id, new PayloadMessage("<bye>")));
-		
+		if (outputThread != null) {
+			// wenn modus vollduplex, dann die threads beenden
+			outputThread.stopSend();
+			output.add(new Message(1, clientID, new PayloadMessage("<bye>")));
+
+		}
+
+		if (inputThread != null) {
+			inputThread.stopListen();
 		}
 
 		try {
@@ -200,15 +244,14 @@ public class HPCServer implements Runnable {
 
 		// so lange vom client lesen bis er seinen header beendet.
 		while (!closeConnection && !endOfHeader) {
-			
 
 			try {
 				antwort = in.readLine();
-				antwort=antwort.trim();
-				antwort=antwort.toLowerCase();
+				antwort = antwort.trim();
+				antwort = antwort.toLowerCase(lowercaseLocale);
 				out.println(antwort);
 			} catch (IOException e) {
-				//Client hat einfach die verbindung abgebrochen
+				// Client hat einfach die verbindung abgebrochen
 				e.printStackTrace();
 			}
 
@@ -216,7 +259,7 @@ public class HPCServer implements Runnable {
 
 				headerErrorCount = 0;
 
-				if (antwort.contains("<" + verkehrsModusName.toLowerCase() + ">")) {
+				if (antwort.contains("<" + verkehrsModusName.toLowerCase(lowercaseLocale) + ">")) {
 
 					int lastpeak = antwort.lastIndexOf(">");
 
@@ -234,14 +277,13 @@ public class HPCServer implements Runnable {
 
 				}
 
-				else if (antwort.toLowerCase().startsWith("<bye>")) {
+				else if (antwort.toLowerCase(lowercaseLocale).startsWith("<bye>")) {
 
 					closeConnection();
 
-				}
-				else if(antwort.startsWith("<eoh>")){
+				} else if (antwort.startsWith("<eoh>")) {
 					log("client <eoh>");
-					endOfHeader=true;
+					endOfHeader = true;
 				}
 
 				else {
@@ -275,7 +317,7 @@ public class HPCServer implements Runnable {
 	 */
 	private boolean setTrafficMode(String value) {
 
-		if (value.equals(CommunicationMode.FullDuplex.toString().toLowerCase())) {
+		if (value.equals(CommunicationMode.FullDuplex.toString().toLowerCase(lowercaseLocale))) {
 			return true;
 		}
 		return false;
@@ -291,9 +333,9 @@ public class HPCServer implements Runnable {
 	 * @return true wenn ein bestandteil des Headers
 	 */
 	private boolean checkHeader(String antwort) {
-		
+
 		log(antwort);
-		
+
 		if (antwort.contains("<option>") || antwort.contains("<bye>") || antwort.contains("<eoh>")) {
 			return true;
 		}
@@ -320,13 +362,139 @@ public class HPCServer implements Runnable {
 	private void fullDuplexCommunikation() {
 		// hier werden die neuen Threads erzeugt die auf beiden streams
 		// gleichzeitig arbeiten
-		
-		outputThread=new OutputStreamThread(out, output);
+
+		outputThread = new OutputStreamThread(out, output);
 		outputThread.start();
 
+		inputThread = new InputStreamThread(in, input);
+		inputThread.start();
+
 		// testausgabe
-		output.add(new Message(1, id, new PayloadMessage("Welckome to here")));
+		output.add(new Message(1, clientID, new PayloadMessage("Welckome to here")));
+
+		Message msg = null;
+
+		while (!closeConnection) {
+
+			if (msg != null) {
+
+				// wenn die Nachricht einen < message > - tag enthält, wird
+				// dieser nachricht noch die clientID zugewiesen (der client
+				// kann ja betrügen..)
+				// und gibt sie dann an den verteiler weiter der dann an die
+				// entsprechenden räume verteilt..
+				if (loopback && msg.getToId() == clientID) {
+					output.add(msg);
+				} else if (msg.getPayload().getType().equals(payloadMessageTAG)) {
+					msg.setFromID(clientID);
+					verteiler.addMessage(msg);
+				} else if (msg.getToId() == serverID) {
+					if (msg.getPayload().getType().equals(payloadControlTAG)) {
+						serverControl(msg);
+					}
+				}
+
+			}
+
+			try {
+				msg = input.take();
+			} catch (InterruptedException e) {
+				// wenn interrupted beim warten auf elemente
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	/**
+	 * wenn die message für den server ist und ein {@code<control>}-TAG hat,
+	 * muss der server aktiv werden..
+	 * 
+	 * @param msg
+	 */
+	private void serverControl(Message msg) {
+
+		String temp = msg.getPayload().getContaining().toLowerCase(lowercaseLocale);
+		String message = msg.getPayload().getContaining();
+
+		if (temp.startsWith(payloadControlChannelTAG)) {
+			temp = temp.substring(payloadControlChannelTAG.length());
+
+			serverChannel(message);
+
+		}else if(temp.startsWith(nameserviceTAG)){
+			temp = temp.substring(nameserviceTAG.length());
+
+			serverNameService(message);
+		}
+
+	}
+
+	/**
+	 * wickelt alles ab was mit dem nameservice zu tun hat..
+	 * @param message
+	 */
+	private void serverNameService(String message) {
+
+		String temp = message.toLowerCase(lowercaseLocale).trim(); 
 		
+		if(temp.startsWith(nickTAG)){
+			//feststellen ob der Nick verfügbar ist 
+		}
+		
+	}
+
+	/**
+	 * handlet alles was {@code <channel>}-TAGs hat..
+	 * 
+	 * @param temp
+	 */
+	private void serverChannel(String payload) {
+		
+		String temp = payload.toLowerCase(lowercaseLocale).trim();
+
+		// <subscribe> .... </subscribe>
+		if (temp.startsWith(subscribeTAG)) {
+
+			//subscribet einen raum
+			String id = getBetweenTAGs(subscribeTAG, subscribeTAGClose, payload);
+
+			if (id != null) {
+				int subscribeID = Integer.parseInt(id);
+
+				verteiler.subscribe(subscribeID, this);
+			}
+
+		} else if (temp.startsWith(unsubscribeTAG)) {
+			// <unsubscribe>...</unsubscribe>
+			//unsubscribet einen Raum
+
+			String id = getBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, payload);
+
+			if (id != null) {
+				int subscribeID = Integer.parseInt(id);
+
+				verteiler.unsubscribe(subscribeID, this);
+			}
+
+		} else if (temp.startsWith(listTAG)) {
+			// <list>
+			//sendet eine liste von Chaträumen an den Client
+
+			ArrayList<Pair<Integer, String>> liste = verteiler.getRoomList();
+			
+			for(Pair<Integer, String> elem : liste){
+				
+				PayloadControl newPayload = new PayloadControl(idTAG+elem.getKey()+idTAGClose+nameTAG+elem.getValue()+nameTAGClose);
+				Message toClient = new Message(serverID, clientID, newPayload);
+				
+				output.add(toClient);
+				
+				
+			}
+			
+		}
 
 	}
 
@@ -350,6 +518,26 @@ public class HPCServer implements Runnable {
 	}
 
 	/**
+	 * Untersucht einen string nach den beiden TAGs und liefert was zwischen
+	 * ihnen steht..
+	 * 
+	 * @param tagBegin
+	 * @param tagEnd
+	 * @param getFrom
+	 * @return {@code null} wenn nichts gefunden werden kann
+	 */
+	private String getBetweenTAGs(String tagBegin, String tagEnd, String getFrom) {
+
+		int startidex = getFrom.indexOf(tagBegin) + tagBegin.length();
+		int startindexClose = getFrom.indexOf(tagEnd);
+
+		if (startidex < startindexClose) {
+			return getFrom.substring(startidex, startindexClose);
+		}
+		return null;
+	}
+
+	/**
 	 * Legt die Nachricht in den Ausgangspuffer.
 	 * 
 	 * @param message
@@ -366,7 +554,7 @@ public class HPCServer implements Runnable {
 	 * @return ID
 	 */
 	public int getID() {
-		return id;
+		return clientID;
 	}
 
 }

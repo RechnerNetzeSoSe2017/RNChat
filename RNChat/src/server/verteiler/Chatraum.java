@@ -57,5 +57,16 @@ public class Chatraum extends Thread {
 		return "---------"+welcomeMessage+name+"--------\n"+Verteiler.welcomeMessage;
 	}
 	
+	/**
+	 * returnt die ID des raumes
+	 * @return
+	 */
+	public int getID(){
+		return id;
+	}
+	public String getRoomName(){
+		return name;
+	}
+	
 
 }

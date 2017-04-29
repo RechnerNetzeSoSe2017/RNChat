@@ -22,6 +22,26 @@ public abstract class Payload {
 		return getPayloadHead()+getPayloadMessage()+getPayloadTail();
 		
 	}
+	/**
+	 * Liefert die Payload mit oder ohne die message oder control TAGs.
+	 * @param tag Ob die TAGs mitgeliefert werden sollen oder nicht
+	 * @return 
+	 */
+	public String getContainer(boolean tag){
+		if(tag){
+			return toString();
+		}else{
+			return payload;
+		}
+	}
+	
+	/**
+	 * liefert die Payload ohne message oder control TAGs
+	 * @return
+	 */
+	public String getContaining(){
+		return payload;
+	}
 
 
 	protected abstract String getPayloadTail();

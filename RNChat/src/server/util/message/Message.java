@@ -34,5 +34,8 @@ public class Message {
 	public String toString(){
 	return "<from>"+from+"</from><to>"+recipient+"</to>"+payload.toString();	
 	}
+	public void setFromID(int id){
+		from=id;
+	}
 
 }
