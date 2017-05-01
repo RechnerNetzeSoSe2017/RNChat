@@ -17,7 +17,7 @@ public class PayloadMessage extends Payload {
 	}
 
 	@Override
-	protected String getPayloadMessage() {
+	public String getPayloadMessage() {
 		
 		return payload;
 	}

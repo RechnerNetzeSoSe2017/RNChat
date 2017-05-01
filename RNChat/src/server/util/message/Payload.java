@@ -3,13 +3,15 @@ package server.util.message;
 public abstract class Payload {
 	
 	private String payload="";
+	private Payload ladung;
 	
 	public Payload(String message) {
 		if(message!=null){
 			payload=message;
 		}
 	}
-	
+	public Payload(Payload inhalt) {
+	}	
 
 	public String getType() {
 		
@@ -47,10 +49,16 @@ public abstract class Payload {
 	protected abstract String getPayloadTail();
 
 
-	protected abstract String getPayloadMessage();
+	public abstract String getPayloadMessage();
 
 
 	protected abstract String getPayloadHead();
+	
+	public abstract Payload getPayload(PayloadType type, boolean tag);
+	
+	public abstract Payload getPayload(PayloadType type);
+	
+	public abstract boolean isType(PayloadType type);
 	
 
 }
