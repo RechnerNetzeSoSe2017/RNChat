@@ -154,11 +154,21 @@ public class PayloadBuilder {
 			
 			if(id != null){
 				return new Payload<Integer>(subscribeTAG, id, subscribeTAGClose);
+			}			
+		}else if(workString.startsWith(unsubscribeTAG)){
+			String temp = getInBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, restString);
+			
+			Integer id;
+			try{
+				id = Integer.parseInt(temp);
+			}catch(NumberFormatException e){
+				id = null;
 			}
 			
-			
-			
-			
+			if(id != null){
+				return new Payload<Integer>(unsubscribeTAG, id, unsubscribeTAGClose);
+			}
+		}else if(workString.startsWith(listTAG)){
 			
 		}
 		
