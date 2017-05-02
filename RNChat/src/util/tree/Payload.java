@@ -11,9 +11,9 @@ public class Payload <Payloadtype>{
 	private String value="";
 	
 	//konstruktor der eine ganze hirachchie parst..
-	public Payload(String praefix, String payload, String suffix) {
-		
-	}
+//	public Payload(String praefix, String payload, String suffix) {
+//		
+//	}
 	public Payload(String prae, Payloadtype pay, String suff) {
 		praefix=prae;
 		suffix=suff;
