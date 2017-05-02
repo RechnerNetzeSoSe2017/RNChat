@@ -1,64 +1,61 @@
 package server.util.message;
 
-public abstract class Payload {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Payload <Payloadtype>{
 	
-	private String payload="";
-	private Payload ladung;
+	private String praefix;
+	private List<Payloadtype> payloadList = new ArrayList<>();
+	private String suffix;
+	private String value="";
 	
-	public Payload(String message) {
-		if(message!=null){
-			payload=message;
+	//konstruktor der eine ganze hirachchie parst..
+//	public Payload(String praefix, String payload, String suffix) {
+//		
+//	}
+	public Payload(String prae, Payloadtype pay, String suff) {
+		praefix=prae;
+		suffix=suff;
+		
+		payloadList.add(pay);
+		
+	}
+	public Payload(String prae, List<Payloadtype> pay, String suff) {
+		praefix=prae;
+		suffix=suff;
+		
+		payloadList.addAll(pay);
+		
+	}
+	
+	
+	public String toString(){
+		String temp=praefix;
+		
+		for(Payloadtype elem : payloadList){
+			temp+=elem.toString();
 		}
-	}
-	public Payload(Payload inhalt) {
-	}	
-
-	public String getType() {
+		temp+=suffix;
 		
-		return getPayloadHead();
+		return temp;
 	}
-	
-
-	public String toString() {
-		
-		return getPayloadHead()+getPayloadMessage()+getPayloadTail();
-		
+	public void addPayload(Payloadtype pl){
+		payloadList.add(pl);
 	}
-	/**
-	 * Liefert die Payload mit oder ohne die message oder control TAGs.
-	 * @param tag Ob die TAGs mitgeliefert werden sollen oder nicht
-	 * @return 
-	 */
-	public String getContainer(boolean tag){
-		if(tag){
-			return toString();
-		}else{
-			return payload;
+	public List<Payloadtype> getPayloadList(){
+		if(payloadList.isEmpty()){
+			return null;
 		}
+		
+		return payloadList;
 	}
-	
-	/**
-	 * liefert die Payload ohne message oder control TAGs
-	 * @return
-	 */
-	public String getContaining(){
-		return payload;
-	}
-
-
-	protected abstract String getPayloadTail();
-
-
-	public abstract String getPayloadMessage();
-
-
-	protected abstract String getPayloadHead();
-	
-	public abstract Payload getPayload(PayloadType type, boolean tag);
-	
-	public abstract Payload getPayload(PayloadType type);
-	
-	public abstract boolean isType(PayloadType type);
-	
+//	public String toString(){
+//		String temp=praefix;
+//		for(Payloadtype elem : payloadList){
+//			temp+=elem.toString();
+//		}
+//		return temp+suffix;
+//	}
 
 }
