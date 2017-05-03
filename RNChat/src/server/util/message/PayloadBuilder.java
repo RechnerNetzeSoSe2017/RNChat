@@ -31,6 +31,10 @@ public class PayloadBuilder {
 	private String nameTAGClose = "</name>";
 	private String channelidTAG = "<channelid>";
 	private String channelidTAGClose = "</channelid>";
+	private String nickaddTAG ="<nickadd>";
+	private String nickaddTAGClose ="</nickadd>";
+	private String nickleaveTAG = "<nickleave>";
+	private String nickleaveTAGClose = "</nickleave>";
 	private String nameserviceTAG = "<nameservice>";
 	private String nameserviceTAGClose = "</nameservice>";
 	private String nickTAG = "<nick>";
@@ -132,6 +136,7 @@ public class PayloadBuilder {
 			String workString = restString.toLowerCase(locale);
 
 			if (workString.contains(channelTAG)) {
+				//<channel>...</channel>
 				String temp = getInBetweenTAGs(channelTAG, channelCloseTAG, restString);
 
 				if (temp != null) {
@@ -145,8 +150,67 @@ public class PayloadBuilder {
 				}
 
 			}else if(workString.contains(channelidTAG)){
-//-------------------------				
+				//<channelid>[nickadd] ODER [nickleave]</channelid>
+
+				String temp = getInBetweenTAGs(channelidTAG, channelidTAGClose, restString);
+				if (temp != null) {
+					Payload channelid = getChannelIDBody(temp);
+
+					if (channelid != null) {
+						//
+						return new Payload<Payload>(channelTAG, channelid, channelCloseTAG);
+					} else {
+						return null;
+					}
+				}
+//-----------
+				
+				
+				
 			}
+		}
+		return null;
+	}
+
+	private Payload getChannelIDBody(String restString) {
+		if(restString != null){
+			//<nickadd><id></id><name></name></nickadd>
+			//ODER
+			//<nickleave><id></id><name></name></nickleave>
+			String workString = restString.toLowerCase(locale);
+
+			if (workString.contains(nickaddTAG)) {
+				//<nickadd>...</nickadd>
+				String temp = getInBetweenTAGs(nickaddTAG, nickaddTAGClose, restString);
+
+				//ab hier ist temp = "<id>[id]</id><name>[name]</name>"
+				
+				if (temp != null) {
+					String id=null;
+					
+					if(temp.contains(idTAG) && temp.contains(idTAGClose)){
+						id = getInBetweenTAGs(idTAG, idTAGClose, temp);
+					}
+					
+					String name = null;
+					if(temp.contains(nameTAG) && temp.contains(nameTAGClose)){
+						name = getInBetweenTAGs(nameTAG, nameTAGClose, temp);
+					}
+					
+					if(id != null && name != null){
+						Payload idPL = new Payload<String>(idTAG, id, idTAGClose);
+						Payload namePL = new Payload<String>(nameTAG, name, nameTAGClose);
+						Payload nickaddPL = new Payload<Payload>(nickaddTAG, idPL, nickaddTAGClose);
+						nickaddPL.addPayload(namePL);
+						return nickaddPL;
+					}
+
+					
+				}
+
+			}
+			
+			
 		}
 		return null;
 	}
