@@ -43,13 +43,16 @@ public class Payload <Payloadtype>{
 	public void addPayload(Payloadtype pl){
 		payloadList.add(pl);
 	}
-	public List<Payloadtype> getPayloadList(){
-		if(payloadList.isEmpty()){
-			return null;
-		}
-		
-		return payloadList;
+	public String getPrefix(){
+		return praefix;
 	}
+//	public List<Payloadtype> getPayloadList(){
+//		if(payloadList.isEmpty()){
+//			return null;
+//		}
+//		
+//		return payloadList;
+//	}
 //	public String toString(){
 //		String temp=praefix;
 //		for(Payloadtype elem : payloadList){

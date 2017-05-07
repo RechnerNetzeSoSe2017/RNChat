@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import server.util.message.Message;
 import server.util.message.Payload;
+import server.util.message.MessageBuilder;
 import server.util.message.PayloadControl;
 import server.util.message.PayloadMessage;
 
@@ -32,6 +33,8 @@ public class InputStreamThread extends Thread {
 	private String tagMessageClose = befehlsPraefix+"/message"+befehlsSuffix;
 	private String tagControl = befehlsPraefix+"control"+befehlsSuffix;
 	private String tagControlClose = befehlsPraefix+"/control"+befehlsSuffix;
+	
+	private MessageBuilder payloadBuilder = new MessageBuilder();
 	
 	
 /**
@@ -68,19 +71,10 @@ public class InputStreamThread extends Thread {
 
 			
 			
-			if(isMessageFormat(clientNachricht)){
-				
-				
-				int fromID = getFromID(clientNachricht);
-				
-				int toID = getToID(clientNachricht);
-				
-				Payload payload = getPayload(clientNachricht);
-				
-				Message message = new Message(fromID, toID, payload);
-				
+			Message<String, String> message = payloadBuilder.getFromString(clientNachricht);
+			
+			if(message != null){
 				input.add(message);
-				
 			}
 						
 			try {
@@ -116,7 +110,7 @@ public class InputStreamThread extends Thread {
 			startidex= temp.indexOf(tagMessage)+tagMessage.length();
 			startindexClose = temp.indexOf(tagMessageClose);
 			
-			payload = new PayloadMessage(clientNachricht.substring(startidex, startindexClose));
+			payload = new Payload(clientNachricht.substring(startidex, startindexClose));
 			
 			
 		}else if(temp.contains(tagControl)){

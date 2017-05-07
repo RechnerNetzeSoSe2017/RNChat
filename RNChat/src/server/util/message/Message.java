@@ -1,24 +1,24 @@
 package server.util.message;
 
-public class Message {
+public class Message<From, To> {
 
-	private int from;
-	private int recipient;
+	private From from;
+	private To recipient;
 	private Payload payload;
 	private long timestamp;
 
-	public Message(int from, int to, Payload payload) {
+	public Message(From from, To to, Payload payload) {
 		this.from = from;
 		recipient = to;
 		this.payload = payload;
 		timestamp=System.currentTimeMillis();
 	}
 	
-	public int getFromID(){
+	public From getFrom(){
 		return from;
 	}
 	
-	public int getToId(){
+	public To getTo(){
 		return recipient;
 	}
 	public Payload getPayload(){
@@ -34,8 +34,11 @@ public class Message {
 	public String toString(){
 	return "<from>"+from+"</from><to>"+recipient+"</to>"+payload.toString();	
 	}
-	public void setFromID(int id){
+	public void setFrom(From id){
 		from=id;
+	}
+	public void setTo(To id){
+		recipient=id;
 	}
 
 }
