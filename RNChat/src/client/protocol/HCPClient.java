@@ -25,7 +25,7 @@ public class HCPClient extends Thread {
 	
 	private Socket socket;
 	private int portNr=33333;
-	private String serverAddr = "localhost";
+	private String serverAddr = "192.168.0.42";
 	
 	//-----------------TAGS als string----------------------
 	private static String befehlsPraefix = "<";

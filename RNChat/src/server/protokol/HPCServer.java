@@ -407,9 +407,16 @@ public class HPCServer implements Runnable {
 						Message mess = messageBuilder.tcSubscribeResponse(name, clientName, "ok");
 						output.add(mess);
 						
+					}else if(control.getPrefix().equals(unsubscribeTAG)){
+					//subscribe
+						
+						verteiler.unsubscribe(null, this);
+						Message mess = messageBuilder.tcUnsubscribeResponse(serverName, clientName, "ok");
+						output.add(mess);
+						
 					}
 					
-					//wenn unsubscribet wurde
+				
 					
 					//und wenn logout übermittelt wurde..
 					else if(control.getPrefix().equals(logoutTAG)){
@@ -470,9 +477,9 @@ public class HPCServer implements Runnable {
 
 		String temp = message.toLowerCase(lowercaseLocale).trim(); 
 		
-		if(temp.startsWith(nickTAG)){
-			//feststellen ob der Nick verfügbar ist 
-		}
+//		if(temp.startsWith(nickTAG)){
+//			//feststellen ob der Nick verfügbar ist 
+//		}
 		
 	}
 

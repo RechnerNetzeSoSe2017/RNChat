@@ -191,6 +191,29 @@ public class MessageBuilder<FromType,ToType> {
 		
 		return msg;
 	}
+	/**
+	 * Baut ein Message-Objekt das die Nachricht enthält, ob das Unsubscriben erfolgreich war oder nicht
+	 * @param from
+	 * @param to
+	 * @param type "ok" für ok, "nok" für nicht ok
+	 * @return
+	 */
+	public Message<FromType,ToType> tcUnsubscribeResponse(FromType from, ToType to, String type){
+		
+		Payload okpl = new Payload<String>("", okTAG, "");
+		
+		if(type.equals("ok")){
+			okpl=new Payload<String>("", okTAG, "");
+		}else if(type.equals("nok")){
+			okpl=new Payload<String>("", nokTAG, "");
+		}
+		
+		Payload subpl = new Payload<>(unsubscribeTAG, okpl, unsubscribeTAGClose);
+		Payload control = new Payload<>(controlTAG, subpl, controlTAGClose);
+		Message<FromType,ToType> msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+	}
 
 	private String getInBetweenTAGs(String tagBegin, String tagEnd, String getFrom) {
 		if (getFrom != null) {

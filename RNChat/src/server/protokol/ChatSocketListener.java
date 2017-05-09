@@ -85,7 +85,7 @@ public class ChatSocketListener extends Thread{
 		}
 		
 		operationStatus=Serverstatus.RUNNING;
-		log("start Listening on Socket on Port "+portNr);
+		log("start Listening on Socketaddress "+serverSocket.getInetAddress()+" on Port "+portNr);
 		
 		while(listen){
 			Socket client = null;
