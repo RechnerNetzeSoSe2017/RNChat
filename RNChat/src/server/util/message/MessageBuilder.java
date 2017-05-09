@@ -2,7 +2,7 @@ package server.util.message;
 
 import java.util.Locale;
 
-public class PayloadBuilder {
+public class MessageBuilder {
 
 	private String closeTAG = ">";
 	// HCPTAG tagLibary = new HCPTAG();
@@ -11,6 +11,10 @@ public class PayloadBuilder {
 	private String headerOKMessage = "<OK>";
 	private String headerNOKMessage = "<NOK>";
 	private String headerErrorMessage = "<ERROR>";
+	private String fromTAG = "<from>";
+	private String fromTAGClose = "</from>";
+	private String toTAG = "<to>";
+	private String toTAGClose = "</to>";
 	private String messageTAG = "<message>";
 	private String messageTAGClose = "</message>";
 	private String controlTAG = "<control>";
@@ -39,6 +43,10 @@ public class PayloadBuilder {
 	private String nameserviceTAGClose = "</nameservice>";
 	private String nickTAG = "<nick>";
 	private String nickTAGClose = "</nick>";
+	private String channellistTAG = "<channellist>";
+	private String channellistTAGClose = "</channellist>";
+	private String logoutTAG = "<logout>";
+	private String logoutTAGClose = "</logout>";
 
 	/**
 	 * Parst anhand eines Strings ein Message-Objekt. Wenn die Syntax nicht
@@ -49,7 +57,32 @@ public class PayloadBuilder {
 	 * @return null wenn parsen nicht erfolgreich, ein Payload-Objekt wenn
 	 *         erfolgreich.
 	 */
-	public synchronized Payload getFromString(String string) {
+	public synchronized Message<String, String> getFromString(String string) {
+		if (string != null) {
+
+			String arbeitsString = string.toLowerCase(locale).trim();
+
+			String from = null;
+			String to = null;
+
+			if (arbeitsString.contains(fromTAG) && arbeitsString.contains(fromTAGClose)) {
+				from = getInBetweenTAGs(fromTAG, fromTAGClose, string);
+			}
+
+			if (arbeitsString.contains(toTAG) && arbeitsString.contains(toTAGClose)) {
+				from = getInBetweenTAGs(toTAG, toTAGClose, string);
+			}
+			Payload payload = getPayloadFromString(string);
+
+			if (payload != null && from != null && to != null) {
+				return new Message<String, String>(from, to, payload);
+			}
+
+		}
+		return null;
+	}
+
+	private Payload getPayloadFromString(String string) {
 		if (string != null) {
 
 			String arbeitsString = string.toLowerCase(locale).trim();
@@ -85,13 +118,29 @@ public class PayloadBuilder {
 			}
 		}
 		return null;
+
 	}
 
-	public Payload newMessage(String nachricht) {
+	public Message newMessage(String from, String to,String nachricht) {
 
 		Payload pl = new Payload<String>(messageTAG, nachricht, messageTAGClose);
+		
 
-		return pl;
+		return new Message<String,String>(from, to, pl);
+	}
+	public Message toClientChannelAdd(String from,String to,String name){
+		
+		
+		if(name != null){
+		
+			Payload add = new Payload<>(addTAG, name, addTAGClose);
+			Payload channel = new Payload<>(channelTAG, add, channelCloseTAG);
+			Payload control = new Payload<>(controlTAG, channel, controlTAGClose);
+			
+			return new Message<String, String>(from, to, control);
+			
+		}
+		return null;
 	}
 
 	/**
@@ -131,6 +180,7 @@ public class PayloadBuilder {
 	}
 
 	private Payload getControlBody(String restString) {
+		//<control>[hier ist  restString]</control>
 		if (restString != null) {
 
 			String workString = restString.toLowerCase(locale);
@@ -149,25 +199,38 @@ public class PayloadBuilder {
 					}
 				}
 
-			} else if (workString.contains(channelidTAG)) {
-				// <channelid>[nickadd] ODER [nickleave]</channelid>
+			} else if (workString.contains(channellistTAG)) {
+				// <channellist></channellist>
 
-				String temp = getInBetweenTAGs(channelidTAG, channelidTAGClose, restString);
+				return new Payload<String>(channellistTAG, "list", channellistTAGClose);
+
+			} else if (workString.contains(subscribeTAG)) {
+				// <subscribe>[ID]<subscribe>
+				String temp = getInBetweenTAGs(subscribeTAG, subscribeTAGClose, restString);
+
 				if (temp != null) {
-					Payload channelid = getChannelIDBody(temp);
 
-					if (channelid != null) {
-						//
-						return new Payload<Payload>(channelTAG, channelid, channelCloseTAG);
-					} else {
-						return null;
-					}
+					return new Payload<String>(subscribeTAG, temp, subscribeTAGClose);
+
 				}
-				// -----------
 
+			}else if(workString.contains(unsubscribeTAG)){
+				//<unsubscribe>[...]</unsubscribe>
+				
+				String temp = getInBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, restString);
+
+				if (temp != null) {
+
+					return new Payload<String>(unsubscribeTAG, temp, unsubscribeTAGClose);
+
+				}
+				
+			}else if(workString.contains(logoutTAG)){
+				return new Payload<String>(logoutTAG, "", logoutTAGClose);
 			}
 		}
 		return null;
+
 	}
 
 	private Payload getChannelIDBody(String restString) {
@@ -226,8 +289,8 @@ public class PayloadBuilder {
 					if (id != null) {
 						Payload idPL = new Payload<String>(idTAG, id, idTAGClose);
 						Payload nickleavePL = new Payload<Payload>(nickleaveTAG, idPL, nickleaveTAGClose);
-						
-						if(name != null){
+
+						if (name != null) {
 							Payload namePL = new Payload<String>(nameTAG, name, nameTAGClose);
 							nickleavePL.addPayload(namePL);
 						}

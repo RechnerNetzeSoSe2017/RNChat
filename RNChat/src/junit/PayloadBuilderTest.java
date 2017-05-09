@@ -6,11 +6,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import server.util.message.Payload;
-import server.util.message.PayloadBuilder;
+import server.util.message.MessageBuilder;
 
 public class PayloadBuilderTest {
 	
-	private PayloadBuilder payloadBuilder = new PayloadBuilder();
+	private MessageBuilder payloadBuilder = new MessageBuilder();
 	
 	@Test
 	public void testFromString(){

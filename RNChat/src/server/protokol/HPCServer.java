@@ -17,6 +17,8 @@ import javafx.util.Pair;
 import server.server.Chatserver;
 import server.util.IDGenerator;
 import server.util.message.Message;
+import server.util.message.MessageBuilder;
+import server.util.message.Payload;
 import server.util.message.PayloadControl;
 import server.util.message.PayloadMessage;
 import server.verteiler.Verteiler;
@@ -32,8 +34,13 @@ import server.verteiler.Verteiler;
  */
 public class HPCServer implements Runnable {
 
+	private static final String headerOKMessage = "<OK>";
+	private static final String headerNOKMessage = "<NOK>";
+	private static final String headerErrorMessage = "<ERROR>";
 	private int clientID;
+	private String clientName="";
 	private int serverID = 1;
+	private String serverName =""+serverID;
 
 	private String protocolVersion = "1.0";
 
@@ -59,31 +66,10 @@ public class HPCServer implements Runnable {
 
 	private boolean closeConnection = false;
 
-	private String befehlsPraefix = "<";
-	private String befehlsSuffix = ">";
-	private String headerOKMessage = "<OK>";
-	private String headerNOKMessage = "<NOK>";
-	private String headerErrorMessage = "<ERROR>";
-	private int headerErrorCount = 0;
-	private int headerErrorMaxCount = 3;
-	private String payloadMessageTAG = "<message>";
-	private String payloadControlTAG = "<control>";
-	private String payloadControlChannelTAG = "<channel>";
-	private String payloadControlChannelCloseTAG = "</channel>";
-	private String subscribeTAG = "<subscribe>";
-	private String subscribeTAGClose = "</subscribe>";
-	private String unsubscribeTAG = "<unsubscribe>";
-	private String unsubscribeTAGClose = "</unsubscribe>";
-	private String listTAG = "<list>";
-	private String listTAGClose = "</list>";
-	private String idTAG = "<id>";
-	private String idTAGClose = "</id>";
-	private String nameTAG = "<name>";
-	private String nameTAGClose = "</name>";
-	private String nameserviceTAG = "<nameservice>";
-	private String nameserviceTAGClose = "</nameservice>";
-	private String nickTAG = "<nick>";
-	private String nickTAGClose = "</nick>";
+	private String channellistTAG ="<channellist>";
+	private String subscribeTAG ="<subscribe>";
+	private String unsubscribeTAG="<unsubscribe>";
+	private String logoutTAG ="<logout>";
 
 	private OutputStreamThread<Message> outputThread;
 	private InputStreamThread inputThread;
@@ -95,6 +81,11 @@ public class HPCServer implements Runnable {
 	private static boolean loopback = true;
 	
 	private Locale lowercaseLocale = Locale.GERMANY;
+	private MessageBuilder messageBuilder = new MessageBuilder();
+	private int headerErrorCount=0;
+	private int headerErrorMaxCount=5;
+	private String controlTAG = "<control>";
+	private String messageTAG = "<message>";
 
 	public HPCServer(Socket socket) {
 
@@ -210,7 +201,7 @@ public class HPCServer implements Runnable {
 		if (outputThread != null) {
 			// wenn modus vollduplex, dann die threads beenden
 			outputThread.stopSend();
-			output.add(new Message(1, clientID, new PayloadMessage("<bye>")));
+			output.add(new Message<String,String>(serverName, clientName, new Payload("","<bye>","")));
 
 		}
 
@@ -370,29 +361,53 @@ public class HPCServer implements Runnable {
 		inputThread.start();
 
 		// testausgabe
-		output.add(new Message(1, clientID, new PayloadMessage("Welckome to here")));
+		output.add(new Message(serverName, clientName, new Payload("","Welckome to here","")));
 
-		Message msg = null;
+		Message<String,String> msg = null;
 
 		while (!closeConnection) {
 
 			if (msg != null) {
+				
+				msg.setFrom(clientName);
 
 				// wenn die Nachricht einen < message > - tag enthält, wird
 				// dieser nachricht noch die clientID zugewiesen (der client
 				// kann ja betrügen..)
 				// und gibt sie dann an den verteiler weiter der dann an die
 				// entsprechenden räume verteilt..
-				if (loopback && msg.getToId() == clientID) {
+				if (loopback) {
 					output.add(msg);
-				} else if (msg.getPayload().getType().equals(payloadMessageTAG)) {
-					msg.setFromID(clientID);
-					verteiler.addMessage(msg);
-				} else if (msg.getToId() == serverID) {
-					if (msg.getPayload().getType().equals(payloadControlTAG)) {
-						serverControl(msg);
-					}
 				}
+				else if(msg.getPayload().getPrefix().equals(messageTAG )){
+					verteiler.addMessage(msg);
+				}
+				//Wenn der server empfänger ist UND es ein controltag ist (Server hat keine message nachrichten)...
+				else if(msg.getTo().equals(serverName) && msg.getPayload().getPrefix().equals(controlTAG )){
+					
+					//wenn die raumliste angefragt wurde..
+					if(msg.getPayload().getPrefix().equals(channellistTAG)){
+						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
+						
+						for(Pair<Integer,String> p : li){
+							output.add(messageBuilder.toClientChannelAdd(serverName, clientName, p.getValue()));
+						}
+						
+					}
+					//subscribe
+					
+					//wenn unsubscribet wurde
+					
+					//und wenn logout übermittelt wurde..
+					
+					
+					
+				}else{
+					verteiler.addMessage(msg);
+				}
+				
+				
+				
 
 			}
 
@@ -407,29 +422,29 @@ public class HPCServer implements Runnable {
 
 	}
 
-	/**
-	 * wenn die message für den server ist und ein {@code<control>}-TAG hat,
-	 * muss der server aktiv werden..
-	 * 
-	 * @param msg
-	 */
-	private void serverControl(Message msg) {
-
-		String temp = msg.getPayload().getContaining().toLowerCase(lowercaseLocale);
-		String message = msg.getPayload().getContaining();
-
-		if (temp.startsWith(payloadControlChannelTAG)) {
-			temp = temp.substring(payloadControlChannelTAG.length());
-
-			serverChannel(message);
-
-		}else if(temp.startsWith(nameserviceTAG)){
-			temp = temp.substring(nameserviceTAG.length());
-
-			serverNameService(message);
-		}
-
-	}
+//	/**
+//	 * wenn die message für den server ist und ein {@code<control>}-TAG hat,
+//	 * muss der server aktiv werden..
+//	 * 
+//	 * @param msg
+//	 */
+//	private void serverControl(Message msg) {
+//
+//		String temp = msg.getPayload().getContaining().toLowerCase(lowercaseLocale);
+//		String message = msg.getPayload().getContaining();
+//
+//		if (temp.startsWith(payloadControlChannelTAG)) {
+//			temp = temp.substring(payloadControlChannelTAG.length());
+//
+//			serverChannel(message);
+//
+//		}else if(temp.startsWith(nameserviceTAG)){
+//			temp = temp.substring(nameserviceTAG.length());
+//
+//			serverNameService(message);
+//		}
+//
+//	}
 
 	/**
 	 * wickelt alles ab was mit dem nameservice zu tun hat..
@@ -445,58 +460,58 @@ public class HPCServer implements Runnable {
 		
 	}
 
-	/**
-	 * handlet alles was {@code <channel>}-TAGs hat..
-	 * 
-	 * @param temp
-	 */
-	private void serverChannel(String payload) {
-		
-		String temp = payload.toLowerCase(lowercaseLocale).trim();
-
-		// <subscribe> .... </subscribe>
-		if (temp.startsWith(subscribeTAG)) {
-
-			//subscribet einen raum
-			String id = getBetweenTAGs(subscribeTAG, subscribeTAGClose, payload);
-
-			if (id != null) {
-				int subscribeID = Integer.parseInt(id);
-
-				verteiler.subscribe(subscribeID, this);
-			}
-
-		} else if (temp.startsWith(unsubscribeTAG)) {
-			// <unsubscribe>...</unsubscribe>
-			//unsubscribet einen Raum
-
-			String id = getBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, payload);
-
-			if (id != null) {
-				int subscribeID = Integer.parseInt(id);
-
-				verteiler.unsubscribe(subscribeID, this);
-			}
-
-		} else if (temp.startsWith(listTAG)) {
-			// <list>
-			//sendet eine liste von Chaträumen an den Client
-
-			ArrayList<Pair<Integer, String>> liste = verteiler.getRoomList();
-			
-			for(Pair<Integer, String> elem : liste){
-				
-				PayloadControl newPayload = new PayloadControl(idTAG+elem.getKey()+idTAGClose+nameTAG+elem.getValue()+nameTAGClose);
-				Message toClient = new Message(serverID, clientID, newPayload);
-				
-				output.add(toClient);
-				
-				
-			}
-			
-		}
-
-	}
+//	/**
+//	 * handlet alles was {@code <channel>}-TAGs hat..
+//	 * 
+//	 * @param temp
+//	 */
+//	private void serverChannel(String payload) {
+//		
+//		String temp = payload.toLowerCase(lowercaseLocale).trim();
+//
+//		// <subscribe> .... </subscribe>
+//		if (temp.startsWith(subscribeTAG)) {
+//
+//			//subscribet einen raum
+//			String id = getBetweenTAGs(subscribeTAG, subscribeTAGClose, payload);
+//
+//			if (id != null) {
+//				int subscribeID = Integer.parseInt(id);
+//
+//				verteiler.subscribe(subscribeID, this);
+//			}
+//
+//		} else if (temp.startsWith(unsubscribeTAG)) {
+//			// <unsubscribe>...</unsubscribe>
+//			//unsubscribet einen Raum
+//
+//			String id = getBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, payload);
+//
+//			if (id != null) {
+//				int subscribeID = Integer.parseInt(id);
+//
+//				verteiler.unsubscribe(subscribeID, this);
+//			}
+//
+//		} else if (temp.startsWith(listTAG)) {
+//			// <list>
+//			//sendet eine liste von Chaträumen an den Client
+//
+//			ArrayList<Pair<Integer, String>> liste = verteiler.getRoomList();
+//			
+//			for(Pair<Integer, String> elem : liste){
+//				
+//				PayloadControl newPayload = new PayloadControl(idTAG+elem.getKey()+idTAGClose+nameTAG+elem.getValue()+nameTAGClose);
+//				Message toClient = new Message(serverID, clientID, newPayload);
+//				
+//				output.add(toClient);
+//				
+//				
+//			}
+//			
+//		}
+//
+//	}
 
 	/**
 	 * sendet die Optionen die dieses Protokoll hat an den Client
