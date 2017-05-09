@@ -84,27 +84,35 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 	 * @param subscribeToID
 	 * @param client
 	 */
-	public void subscribe(ID subscribeToID, HPCServer client){
+	public boolean subscribe(ID subscribeToID, HPCServer client){
+		
+		boolean temp=false;
 		
 		for(Chatraum raum : raumListe){
 			if(raum.getRoomName().equals(subscribeToID)){
-				raum.subscibe(client);
+				temp=raum.subscibe(client);
 				break;
 			}
 		}
-		
+		return temp;
 	}
 	/**
 	 * entfern den client aus dem verteiler für den entsprechenden raum..
-	 * @param subscribeToID
+	 * @param subscribeToID wenn null, dann wird bei ALLEN channels unsubscribed, ansonsten wird nach dem raum gesucht
 	 * @param client
 	 */
 	public void unsubscribe(ID subscribeToID, HPCServer client){
-		if(subscribeToID.equals(adresseAlleRaeume)){
+		
 			for(Chatraum raum : raumListe){
-				raum.unsubscribe(client);
+				
+				if(subscribeToID == null){
+					raum.unsubscribe(client);
+				}else if(raum.getRoomName().equals(subscribeToID)){
+					raum.unsubscribe(client);
+					break;
+				}
 			}
-		}
+		
 	}
 	
 	/**

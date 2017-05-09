@@ -15,7 +15,7 @@ public class MessageBuilder<FromType,ToType> {
 	private String fromTAGClose = "</from>";
 	private String toTAG = "<to>";
 	private String toTAGClose = "</to>";
-	private String messageTAG = "<message>";
+	public final String messageTAG = "<message>";
 	private String messageTAGClose = "</message>";
 	private String controlTAG = "<control>";
 	private String controlTAGClose = "</control>";

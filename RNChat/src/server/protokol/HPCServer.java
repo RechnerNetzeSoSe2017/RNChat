@@ -61,6 +61,9 @@ public class HPCServer implements Runnable {
 	// eine HashMap für die optionen.
 	private HashMap<String, String> optionen = new HashMap<>();
 	private static HashMap<String, String> optionsListing = new HashMap<>();
+	
+	//hält eine referenz auf abbonierte raeume..
+	private ArrayList<String> abbonierteRaeume = new ArrayList<>();
 
 	private BufferedReader in = null;
 	private PrintWriter out = null;
@@ -388,23 +391,29 @@ public class HPCServer implements Runnable {
 					
 					//wenn die raumliste angefragt wurde..
 					List<Payload> plist = msg.getPayload().getPayloadList();
-					Payload payl = plist.get(0);
+					Payload control = plist.get(0);
 					
-					if(payl.getPrefix().equals(channellistTAG)){
+					if(control.getPrefix().equals(channellistTAG)){
 						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
 						
 						for(Pair<Integer,String> p : li){
 							output.add(messageBuilder.toClientChannelAdd(serverName, clientName, p.getValue()));
 						}
 						
-					}
+					}else if(control.getPrefix().equals(subscribeTAG)){
 					//subscribe
+						String name = control.getPayloadList().get(0).toString();
+						boolean erfolg = verteiler.subscribe(name, this);
+						Message mess = messageBuilder.tcSubscribeResponse(name, clientName, "ok");
+						output.add(mess);
+						
+					}
 					
 					//wenn unsubscribet wurde
 					
 					//und wenn logout übermittelt wurde..
-					else if(payl.getPrefix().equals(logoutTAG)){
-						verteiler.unsubscribe(serverName, this);
+					else if(control.getPrefix().equals(logoutTAG)){
+						verteiler.unsubscribe(null, this);
 						closeConnection();
 					}
 					
@@ -577,6 +586,9 @@ public class HPCServer implements Runnable {
 	 */
 	public int getID() {
 		return clientID;
+	}
+	public String getClientName(){
+		return clientName;
 	}
 
 }

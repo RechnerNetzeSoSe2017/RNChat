@@ -230,15 +230,15 @@ public class InputStreamThread extends Thread {
 //		return false;
 //	}
 //
-//	/**
-//	 * Sorgt dafür das der Stream nicht mehr weiter liest und versucht ihn zu beenden
-//	 */
-//	public void stopListen() {
-//		listen = false;
-//
-//		
-//
-//	}
-//	
+	/**
+	 * Sorgt dafür das der Stream nicht mehr weiter liest und versucht ihn zu beenden
+	 */
+	public void stopListen() {
+		listen = false;
+
+		
+
+	}
+	
 
 }
