@@ -6,7 +6,7 @@ import java.util.List;
 public class Payload <Payloadtype>{
 	
 	private String praefix;
-	private List<Payloadtype> payloadList = new ArrayList<>();
+	private List<Payload> payloadList = new ArrayList<>();
 	private String suffix;
 	private String value="";
 	
@@ -14,14 +14,14 @@ public class Payload <Payloadtype>{
 //	public Payload(String praefix, String payload, String suffix) {
 //		
 //	}
-	public Payload(String prae, Payloadtype pay, String suff) {
+	public Payload(String prae, Payload pay, String suff) {
 		praefix=prae;
 		suffix=suff;
 		
 		payloadList.add(pay);
 		
 	}
-	public Payload(String prae, List<Payloadtype> pay, String suff) {
+	public Payload(String prae, List<Payload> pay, String suff) {
 		praefix=prae;
 		suffix=suff;
 		
@@ -33,26 +33,26 @@ public class Payload <Payloadtype>{
 	public String toString(){
 		String temp=praefix;
 		
-		for(Payloadtype elem : payloadList){
+		for(Payload elem : payloadList){
 			temp+=elem.toString();
 		}
 		temp+=suffix;
 		
 		return temp;
 	}
-	public void addPayload(Payloadtype pl){
+	public void addPayload(Payload pl){
 		payloadList.add(pl);
 	}
 	public String getPrefix(){
 		return praefix;
 	}
-//	public List<Payloadtype> getPayloadList(){
-//		if(payloadList.isEmpty()){
-//			return null;
-//		}
-//		
-//		return payloadList;
-//	}
+	public List<Payload> getPayloadList(){
+		if(payloadList.isEmpty()){
+			return null;
+		}
+		
+		return payloadList;
+	}
 //	public String toString(){
 //		String temp=praefix;
 //		for(Payloadtype elem : payloadList){

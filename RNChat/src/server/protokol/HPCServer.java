@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -386,7 +387,10 @@ public class HPCServer implements Runnable {
 				else if(msg.getTo().equals(serverName) && msg.getPayload().getPrefix().equals(controlTAG )){
 					
 					//wenn die raumliste angefragt wurde..
-					if(msg.getPayload().getPrefix().equals(channellistTAG)){
+					List<Payload> plist = msg.getPayload().getPayloadList();
+					Payload channel = plist.get(0);
+					
+					if(channel.getPrefix().equals(channellistTAG)){
 						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
 						
 						for(Pair<Integer,String> p : li){
