@@ -25,6 +25,7 @@ public class Chatraum extends Thread {
 	private ArrayList<HPCServer> clientList = new ArrayList<>();
 	
 	private String welcomeMessage = "Wilkommen im Raum: ";
+	private boolean arbeiten=true;
 	
 	public Chatraum(String name) {
 		if(!name.equals("")){
@@ -36,7 +37,31 @@ public class Chatraum extends Thread {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		// 
+		
+		Message msg = null;
+		
+		while(arbeiten){
+			
+			try {
+				msg=nachrichten.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				msg=null;
+			}
+			
+			if(msg!=null){
+				
+				//tue dinge
+				
+			}
+			
+			
+			
+		}
+		
+		
 	
 	}
 	
