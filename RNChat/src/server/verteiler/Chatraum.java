@@ -6,7 +6,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import server.protokol.HPCServer;
 import server.util.IDGenerator;
 import server.util.message.Message;
-import server.util.message.PayloadMessage;
+import server.util.message.Payload;
+
 
 
 /**
@@ -49,10 +50,19 @@ public class Chatraum extends Thread {
 			
 			// TODO gescheites willkommensnachrichtensystem entwickeln
 			
-			client.sendMessage(new Message(id, client.getID(), new PayloadMessage(welcomeMessage())));
+//			client.sendMessage(new Message(id, client.getID(), new Payload(welcomeMessage())));
 			
 		}
 	}
+	
+	public void unsubscribe(HPCServer client){
+	
+		if(client != null){
+			 clientList.remove(client);
+			
+		}
+	}
+	
 	private String welcomeMessage(){
 		return "---------"+welcomeMessage+name+"--------\n"+Verteiler.welcomeMessage;
 	}
@@ -64,8 +74,15 @@ public class Chatraum extends Thread {
 	public int getID(){
 		return id;
 	}
+	
+//	public String getIDName(){
+//		return name;
+//	}
 	public String getRoomName(){
 		return name;
+	}
+	public void addMessage(Message msg){
+		nachrichten.add(msg);
 	}
 	
 

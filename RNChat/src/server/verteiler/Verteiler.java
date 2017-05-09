@@ -15,7 +15,7 @@ import server.util.message.Message;
  * @author Höling
  *
  */
-public class Verteiler extends Thread {
+public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 
 	private ArrayList<Chatraum> raumListe = new ArrayList<Chatraum>();
 	
@@ -25,6 +25,9 @@ public class Verteiler extends Thread {
 	
 	private static Verteiler instanz = null;
 	
+	private String adresseAlleRaeume="";
+	
+	private boolean arbeiten = true;
 	
 	public Verteiler() {
 		// erstmal 3 räume fix anlegen. dynamität später nachrüsten..
@@ -35,7 +38,32 @@ public class Verteiler extends Thread {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		// 
+		
+		Message<MessageFrom,MessageTo> msg=null;
+		while(arbeiten){
+			
+			try {
+				msg=zuVerteilendeNachrichten.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				msg=null;
+			}
+			if(msg != null){
+				MessageTo recipient = msg.getTo();
+				
+				for(Chatraum raum : raumListe){
+					if(recipient.equals(raum.getRoomName())){
+						raum.addMessage(msg);
+						break;
+					}
+				}
+				
+			}
+			
+		}
+		
 		
 	}
 	public static Verteiler getInstance(String name){
@@ -56,7 +84,14 @@ public class Verteiler extends Thread {
 	 * @param subscribeToID
 	 * @param client
 	 */
-	public void subscribe(int subscribeToID, HPCServer client){
+	public void subscribe(ID subscribeToID, HPCServer client){
+		
+		for(Chatraum raum : raumListe){
+			if(raum.getRoomName().equals(subscribeToID)){
+				raum.subscibe(client);
+				break;
+			}
+		}
 		
 	}
 	/**
@@ -64,8 +99,12 @@ public class Verteiler extends Thread {
 	 * @param subscribeToID
 	 * @param client
 	 */
-	public void unsubscribe(int subscribeToID, HPCServer client){
-		
+	public void unsubscribe(ID subscribeToID, HPCServer client){
+		if(subscribeToID.equals(adresseAlleRaeume)){
+			for(Chatraum raum : raumListe){
+				raum.unsubscribe(client);
+			}
+		}
 	}
 	
 	/**

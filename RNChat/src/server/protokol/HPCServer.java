@@ -20,8 +20,8 @@ import server.util.IDGenerator;
 import server.util.message.Message;
 import server.util.message.MessageBuilder;
 import server.util.message.Payload;
-import server.util.message.PayloadControl;
-import server.util.message.PayloadMessage;
+
+
 import server.verteiler.Verteiler;
 
 /**
@@ -202,7 +202,7 @@ public class HPCServer implements Runnable {
 		if (outputThread != null) {
 			// wenn modus vollduplex, dann die threads beenden
 			outputThread.stopSend();
-			output.add(new Message<String,String>(serverName, clientName, new Payload("","<bye>","")));
+			output.add(new Message<String,String>(serverName, clientName, new Payload<String>("","<bye>","")));
 
 		}
 
@@ -388,9 +388,9 @@ public class HPCServer implements Runnable {
 					
 					//wenn die raumliste angefragt wurde..
 					List<Payload> plist = msg.getPayload().getPayloadList();
-					Payload channel = plist.get(0);
+					Payload payl = plist.get(0);
 					
-					if(channel.getPrefix().equals(channellistTAG)){
+					if(payl.getPrefix().equals(channellistTAG)){
 						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
 						
 						for(Pair<Integer,String> p : li){
@@ -403,7 +403,10 @@ public class HPCServer implements Runnable {
 					//wenn unsubscribet wurde
 					
 					//und wenn logout übermittelt wurde..
-					
+					else if(payl.getPrefix().equals(logoutTAG)){
+						verteiler.unsubscribe(serverName, this);
+						closeConnection();
+					}
 					
 					
 				}else{
