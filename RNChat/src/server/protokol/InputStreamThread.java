@@ -69,11 +69,13 @@ public class InputStreamThread extends Thread {
 
 			
 			if (clientNachricht != null) {
-				System.out.println("C>\t" + clientNachricht);
+				
 				Message<String, String> message = payloadBuilder.getFromString(clientNachricht);
+				
 
 				if (message != null) {
 					input.add(message);
+					
 				}
 
 			}

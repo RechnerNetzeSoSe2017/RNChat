@@ -242,7 +242,42 @@ public class MessageBuilder<FromType, ToType> {
 		}
 		return null;
 	}
+	
+	/**
+	 * generiert eine nick-add Nachricht
+	 * @param from
+	 * @param to
+	 * @param name
+	 * @return
+	 */
+	public Message getNickadd(FromType from, ToType to,String name){
+		
+		
+		Payload<String> nickadd = new Payload<>(nickaddTAG, name, nickaddTAGClose);
+		Payload<Payload> control = new Payload<>(controlTAG, nickadd, controlTAGClose);
+		
+		Message msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+	}
 
+	/**
+	 * generiert eine nick-leave nachricht
+	 * @param from
+	 * @param to
+	 * @param name
+	 * @return
+	 */
+	public Message getNickLeave(FromType from, ToType to,String name){
+		
+		
+		Payload<String> nickadd = new Payload<>(nickleaveTAG, name, nickleaveTAGClose);
+		Payload<Payload> control = new Payload<>(controlTAG, nickadd, controlTAGClose);
+		
+		Message msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+	}
 	private Payload getControlBody(String restString) {
 		// <control>[hier ist restString]</control>
 		if (restString != null) {

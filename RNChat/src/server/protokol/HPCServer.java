@@ -222,6 +222,8 @@ public class HPCServer implements Runnable {
 			e.printStackTrace();
 		}
 
+		
+		
 		try {
 			socket.close();
 		} catch (IOException e) {
@@ -372,8 +374,16 @@ public class HPCServer implements Runnable {
 		while (!closeConnection) {
 
 			if (msg != null) {
+//				log("clientmessage>\t"+msg.toString());
 				
 				msg.setFrom(clientName);
+				
+				
+				List<Payload> plist = msg.getPayload().getPayloadList();
+//				
+//				System.out.println("präfix:"+msg.getPayload().getPrefix());
+//				System.out.println("ganzes payload: "+msg.getPayload());
+//				System.out.println("unter control:"+plist.get(0).getPrefix());
 
 				// wenn die Nachricht einen < message > - tag enthält, wird
 				// dieser nachricht noch die clientID zugewiesen (der client
@@ -383,31 +393,34 @@ public class HPCServer implements Runnable {
 				if (loopback) {
 					output.add(msg);
 				}
-				else if(msg.getPayload().getPrefix().equals(messageTAG )){
+				if(msg.getPayload().getPrefix().contains(messageTAG )){
 					verteiler.addMessage(msg);
 				}
 				//Wenn der server empfänger ist UND es ein controltag ist (Server hat keine message nachrichten)...
-				else if(msg.getTo().equals(serverName) && msg.getPayload().getPrefix().equals(controlTAG )){
+				else if(msg.getPayload().getPrefix().contains(controlTAG)){
 					
 					//wenn die raumliste angefragt wurde..
-					List<Payload> plist = msg.getPayload().getPayloadList();
+					
 					Payload control = plist.get(0);
 					
-					if(control.getPrefix().equals(channellistTAG)){
+					log("client message>\t"+control.toString());
+					
+					if(control.getPrefix().contains(channellistTAG)){
 						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
 						
 						for(Pair<Integer,String> p : li){
 							output.add(messageBuilder.toClientChannelAdd(serverName, clientName, p.getValue()));
 						}
 						
-					}else if(control.getPrefix().equals(subscribeTAG)){
+					}else if(control.getPrefix().contains(subscribeTAG)){
 					//subscribe
 						String name = control.getPayloadList().get(0).toString();
+						
 						boolean erfolg = verteiler.subscribe(name, this);
 						Message mess = messageBuilder.tcSubscribeResponse(name, clientName, "ok");
 						output.add(mess);
 						
-					}else if(control.getPrefix().equals(unsubscribeTAG)){
+					}else if(control.getPrefix().contains(unsubscribeTAG)){
 					//subscribe
 						
 						verteiler.unsubscribe(null, this);

@@ -55,7 +55,7 @@ public class Chatraum extends Thread {
 				msg=nachrichten.take();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 				msg=null;
 			}
 			
@@ -110,7 +110,7 @@ public class Chatraum extends Thread {
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 			
 			//wenn DIESER Thread beim warten interrupted wurde, wird die nicht abgearbeitete Nachricht wieder an die 1. stelle gesetzt
 			nachrichten.addFirst(msg);
@@ -153,7 +153,7 @@ public class Chatraum extends Thread {
 		}
 		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}finally{
 			semaphore.release();
 		}
@@ -181,6 +181,12 @@ public class Chatraum extends Thread {
 	}
 	public void addMessage(Message msg){
 		nachrichten.add(msg);
+	}
+
+	public void stopWorking() {
+		arbeiten=false;
+		interrupt();
+		
 	}
 	
 

@@ -34,6 +34,9 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 		
 		instanz=this;
 		
+		raumListe.add(new Chatraum("Raum 1"));
+		raumListe.add(new Chatraum("Raum 2"));
+		
 	}
 	
 	@Override
@@ -47,7 +50,7 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 				msg=zuVerteilendeNachrichten.take();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 				msg=null;
 			}
 			if(msg != null){
@@ -130,6 +133,27 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 		} 
 		
 		return liste;
+	}
+
+	public void stopVerteilen() {
+		arbeiten=false;
+		
+		for(Chatraum raum : raumListe){
+			raum.stopWorking();
+		}
+		interrupt();
+		
+		
 	} 
+	@Override
+	public synchronized void start() {
+		// TODO Auto-generated method stub
+		super.start();
+		
+		for(Chatraum raum: raumListe){
+			raum.start();
+		}
+		
+	}
 	
 }

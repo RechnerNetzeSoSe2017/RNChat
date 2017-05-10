@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import server.protokol.ChatSocketListener;
+import server.verteiler.Verteiler;
 
 /**
  * 
@@ -30,6 +31,8 @@ public class Chatserver {
 	private HashSet<String> nicknames;
 
 	private static ArrayList<Chatserver> chatserverList = new ArrayList<>();
+	
+	private Verteiler<String,String,String> verteiler;// = new Verteiler<String,String,String>();
 
 	public Chatserver(String name, int port) {
 		if (!name.equals("")) {
@@ -61,6 +64,11 @@ public class Chatserver {
 
 		}
 		//den verteiler starten
+		if(verteiler == null){
+			verteiler = new Verteiler<String,String,String>();
+			log("starte Verteiler..");
+			verteiler.start();
+		}
 
 	}
 
@@ -71,7 +79,12 @@ public class Chatserver {
 		if (protokoll != null) {
 
 			protokoll.stopListen();
+			protokoll.interrupt();
 
+		}
+		if(verteiler != null){
+			verteiler.stopVerteilen();
+			
 		}
 
 	}
