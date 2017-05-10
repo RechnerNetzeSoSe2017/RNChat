@@ -32,11 +32,12 @@ public class OutputStreamThread<E> extends Thread {
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				//hier vielleicht die verbindnug beenden?
-				e.printStackTrace();
+//				e.printStackTrace();
+//				shutdown=true;
 				continue;
 			}
 			
-			if(!shutdown){
+			if(!shutdown && msg != null){
 				out.println(msg);
 			}
 			

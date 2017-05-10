@@ -101,6 +101,7 @@ public class UIController implements Initializable{
 		disconnectB.setDisable(true);
 		
 		connectB.setOnAction(actionEvent ->{connectToServer();});
+		disconnectB.setOnAction(actionEvent ->{disconnect();});
 		
 		
 		

@@ -62,7 +62,8 @@ public class InputStreamThread extends Thread {
 					
 		} catch (IOException e) {
 			//wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
-			e.printStackTrace();
+//			e.printStackTrace();
+//			listen=false;
 		}
 		
 
@@ -79,12 +80,12 @@ public class InputStreamThread extends Thread {
 			try {
 				clientNachricht = in.readLine();
 				
-				 
+				 listen=false;
 				
 			} catch (IOException e) {
 				//wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
 				//z.b. wenn man ihn schliesst...
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 			
 		}

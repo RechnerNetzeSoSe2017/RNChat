@@ -64,18 +64,24 @@ public class MessageBuilder<FromType, ToType> {
 	public synchronized Message<String, String> getFromString(String string) {
 		if (string != null) {
 
-			String arbeitsString = string.toLowerCase(locale).trim();
+			String arbeitsString = string.toLowerCase(locale);
 
 			String from = null;
 			String to = null;
 
 			if (arbeitsString.contains(fromTAG) && arbeitsString.contains(fromTAGClose)) {
 				from = getInBetweenTAGs(fromTAG, fromTAGClose, string);
+			
 			}
 
 			if (arbeitsString.contains(toTAG) && arbeitsString.contains(toTAGClose)) {
-				from = getInBetweenTAGs(toTAG, toTAGClose, string);
+				to = getInBetweenTAGs(toTAG, toTAGClose, string);
+			
 			}
+			
+			
+//			int start =arbeitsString.indexOf(toTAGClose)+toTAGClose.length();
+			
 			Payload payload = getPayloadFromString(string);
 
 			if (payload != null && from != null && to != null) {
@@ -92,20 +98,21 @@ public class MessageBuilder<FromType, ToType> {
 			String arbeitsString = string.toLowerCase(locale).trim();
 
 			if (arbeitsString.contains(messageTAG)) {
-				int begin = string.indexOf(">") + 1;
-				int ende = string.lastIndexOf("<");
+//				int begin = string.indexOf(">") + 1;
+//				int ende = string.lastIndexOf("<");
 
-				if (begin < ende) {
+				
 					// String nachricht = string.substring(begin, ende);
 					String nachricht = getInBetweenTAGs(messageTAG, messageTAGClose, string);
 
+					if(nachricht != null){
 					Payload pl = new Payload<String>(messageTAG, nachricht, messageTAGClose);
+					
 
 					return pl;
+					}
 
-				} else {
-					return null;
-				}
+				
 
 			} else if (arbeitsString.contains(controlTAG)) {
 				// ab hier ist klar das es sich um ein control tag handelt..
