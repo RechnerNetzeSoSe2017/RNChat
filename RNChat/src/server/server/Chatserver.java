@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import server.protokol.ChatSocketListener;
+import server.util.Nameservice;
 import server.verteiler.Verteiler;
 
 /**
@@ -44,6 +45,8 @@ public class Chatserver {
 		portNr = port;
 
 		chatserverList.add(this);
+		
+		new Nameservice("Chatserver");
 
 	}
 

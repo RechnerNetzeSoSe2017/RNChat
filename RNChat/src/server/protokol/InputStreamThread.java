@@ -247,6 +247,7 @@ public class InputStreamThread extends Thread {
 	public void stopListen() {
 		listen = false;
 
+		interrupt();
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javafx.util.Pair;
 import server.server.Chatserver;
 import server.util.IDGenerator;
+import server.util.Nameservice;
 import server.util.message.Message;
 import server.util.message.MessageBuilder;
 import server.util.message.Payload;
@@ -90,6 +91,8 @@ public class HPCServer implements Runnable {
 	private int headerErrorMaxCount=5;
 	private String controlTAG = "<control>";
 	private String messageTAG = "<message>";
+	
+	private Nameservice nslookup=Nameservice.getInstance("Chatsserver");
 
 	public HPCServer(Socket socket) {
 
@@ -191,6 +194,8 @@ public class HPCServer implements Runnable {
 		// ab hier läuft die kommunikation über einen anderen thread und es kann
 		// begommen werden die Nachriichten aus der
 		// inputqueue zu verarbeiten.
+		
+		ChatSocketListener.removeClient(this);
 
 	}
 
@@ -219,7 +224,7 @@ public class HPCServer implements Runnable {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 		
@@ -228,8 +233,9 @@ public class HPCServer implements Runnable {
 			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
+		
 
 	}
 
@@ -281,6 +287,21 @@ public class HPCServer implements Runnable {
 				} else if (antwort.startsWith("<eoh>")) {
 					log("client <eoh>");
 					endOfHeader = true;
+				}else if(antwort.contains("<nickname>")){
+					int lastpeak = antwort.lastIndexOf(">");
+
+					String value = antwort.substring(lastpeak + 1);
+					
+					if(value!=null && value.length()>0){
+						if(nslookup.addName(value.trim())){
+							out.println("<ok>");
+							clientName=value;
+							
+						}else{
+							out.println("<nok>");
+						}
+					}
+					
 				}
 
 				else {
@@ -333,7 +354,7 @@ public class HPCServer implements Runnable {
 
 		log(antwort);
 
-		if (antwort.contains("<option>") || antwort.contains("<bye>") || antwort.contains("<eoh>")) {
+		if (antwort.contains("<option>") || antwort.contains("<bye>") || antwort.contains("<eoh>") || antwort.contains("<nickname>")) {
 			return true;
 		}
 		return false;
