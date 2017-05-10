@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import client.gui.UIController;
+import server.protokol.InputStreamThread;
 import server.protokol.OutputStreamThread;
 
 public class HCPClient extends Thread {
@@ -47,6 +48,7 @@ public class HCPClient extends Thread {
 //	private LinkedBlockingQueue<E>
 	
 	private OutputStreamThread<String> outputThread;
+	private InputStreamThread inputThread; 
 	
 	
 	/**
@@ -109,6 +111,8 @@ public class HCPClient extends Thread {
 				//ab hier ist wieder provisorisch...
 				outputThread = new OutputStreamThread(out, outputQueue);
 				outputThread.start();
+				
+//				inputThread = new InputStreamThread(in, queue)
 				
 				while(!socket.isClosed()){
 				try {
@@ -242,6 +246,10 @@ public class HCPClient extends Thread {
 	
 	private String getToTAG(int idReceiver){
 		return befehlsPraefix+"to"+befehlsSuffix+idReceiver+befehlsPraefix+"/to"+befehlsSuffix;
+	}
+	public void closeConnection(){
+		outputThread.stopSend();
+		
 	}
 
 }

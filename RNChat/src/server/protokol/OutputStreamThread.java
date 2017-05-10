@@ -46,5 +46,6 @@ public class OutputStreamThread<E> extends Thread {
 	
 	public void stopSend(){
 		shutdown=true;
+		interrupt();
 	}
 }

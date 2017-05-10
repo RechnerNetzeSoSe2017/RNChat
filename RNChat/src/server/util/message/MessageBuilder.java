@@ -2,7 +2,7 @@ package server.util.message;
 
 import java.util.Locale;
 
-public class MessageBuilder<FromType,ToType> {
+public class MessageBuilder<FromType, ToType> {
 
 	private String closeTAG = ">";
 	// HCPTAG tagLibary = new HCPTAG();
@@ -47,10 +47,10 @@ public class MessageBuilder<FromType,ToType> {
 	private String channellistTAGClose = "</channellist>";
 	private String logoutTAG = "<logout>";
 	private String logoutTAGClose = "</logout>";
-	private String okTAG="<OK>";
-	private String okTAGClose="</OK>";
-	private String nokTAG ="<NOK>";
-	private String errorTAG="<ERROR>";
+	private String okTAG = "<OK>";
+	private String okTAGClose = "</OK>";
+	private String nokTAG = "<NOK>";
+	private String errorTAG = "<ERROR>";
 
 	/**
 	 * Parst anhand eines Strings ein Message-Objekt. Wenn die Syntax nicht
@@ -125,24 +125,23 @@ public class MessageBuilder<FromType,ToType> {
 
 	}
 
-	public Message newMessage(String from, String to,String nachricht) {
+	public Message newMessage(String from, String to, String nachricht) {
 
 		Payload<String> pl = new Payload<String>(messageTAG, nachricht, messageTAGClose);
-		
 
-		return new Message<String,String>(from, to, pl);
+		return new Message<String, String>(from, to, pl);
 	}
-	public Message toClientChannelAdd(String from,String to,String name){
-		
-		
-		if(name != null){
-		
+
+	public Message toClientChannelAdd(String from, String to, String name) {
+
+		if (name != null) {
+
 			Payload<String> add = new Payload<>(addTAG, name, addTAGClose);
 			Payload channel = new Payload<>(channelTAG, add, channelCloseTAG);
 			Payload control = new Payload<>(controlTAG, channel, controlTAGClose);
-			
+
 			return new Message<String, String>(from, to, control);
-			
+
 		}
 		return null;
 	}
@@ -168,50 +167,58 @@ public class MessageBuilder<FromType,ToType> {
 
 		return controlPL;
 	}
+
 	/**
-	 * Baut ein Message-Objekt das die Nachricht enthält, ob die Subscribtion erfolgreich war oder nicht
+	 * Baut ein Message-Objekt das die Nachricht enthält, ob die Subscribtion
+	 * erfolgreich war oder nicht
+	 * 
 	 * @param from
 	 * @param to
-	 * @param type "ok" für ok, "nok" für nicht ok
+	 * @param type
+	 *            "ok" für ok, "nok" für nicht ok
 	 * @return
 	 */
-	public Message<FromType,ToType> tcSubscribeResponse(FromType from, ToType to, String type){
-		
+	public Message<FromType, ToType> tcSubscribeResponse(FromType from, ToType to, String type) {
+
 		Payload okpl = new Payload<String>("", okTAG, "");
-		
-		if(type.equals("ok")){
-			okpl=new Payload<String>("", okTAG, "");
-		}else if(type.equals("nok")){
-			okpl=new Payload<String>("", nokTAG, "");
+
+		if (type.equals("ok")) {
+			okpl = new Payload<String>("", okTAG, "");
+		} else if (type.equals("nok")) {
+			okpl = new Payload<String>("", nokTAG, "");
 		}
-		
+
 		Payload subpl = new Payload<>(subscribeTAG, okpl, subscribeTAGClose);
 		Payload control = new Payload<>(controlTAG, subpl, controlTAGClose);
-		Message<FromType,ToType> msg = new Message<FromType, ToType>(from, to, control);
-		
+		Message<FromType, ToType> msg = new Message<FromType, ToType>(from, to, control);
+
 		return msg;
 	}
+
 	/**
-	 * Baut ein Message-Objekt das die Nachricht enthält, ob das Unsubscriben erfolgreich war oder nicht
+	 * Baut ein Message-Objekt das die Nachricht enthält, ob das Unsubscriben
+	 * erfolgreich war oder nicht
+	 * 
 	 * @param from
 	 * @param to
-	 * @param type "ok" für ok, "nok" für nicht ok
+	 * @param type
+	 *            "ok" für ok, "nok" für nicht ok
 	 * @return
 	 */
-	public Message<FromType,ToType> tcUnsubscribeResponse(FromType from, ToType to, String type){
-		
+	public Message<FromType, ToType> tcUnsubscribeResponse(FromType from, ToType to, String type) {
+
 		Payload okpl = new Payload<String>("", okTAG, "");
-		
-		if(type.equals("ok")){
-			okpl=new Payload<String>("", okTAG, "");
-		}else if(type.equals("nok")){
-			okpl=new Payload<String>("", nokTAG, "");
+
+		if (type.equals("ok")) {
+			okpl = new Payload<String>("", okTAG, "");
+		} else if (type.equals("nok")) {
+			okpl = new Payload<String>("", nokTAG, "");
 		}
-		
+
 		Payload subpl = new Payload<>(unsubscribeTAG, okpl, unsubscribeTAGClose);
 		Payload control = new Payload<>(controlTAG, subpl, controlTAGClose);
-		Message<FromType,ToType> msg = new Message<FromType, ToType>(from, to, control);
-		
+		Message<FromType, ToType> msg = new Message<FromType, ToType>(from, to, control);
+
 		return msg;
 	}
 
@@ -230,26 +237,29 @@ public class MessageBuilder<FromType,ToType> {
 	}
 
 	private Payload getControlBody(String restString) {
-		//<control>[hier ist  restString]</control>
+		// <control>[hier ist restString]</control>
 		if (restString != null) {
 
 			String workString = restString.toLowerCase(locale);
 
-			if (workString.contains(channelTAG)) {
-				// <channel>...</channel>
-				String temp = getInBetweenTAGs(channelTAG, channelCloseTAG, restString);
-
-				if (temp != null) {
-					Payload channel = getChannelBody(temp);
-
-					if (channel != null) {
-						return new Payload<Payload>(channelTAG, channel, channelCloseTAG);
-					} else {
-						return null;
-					}
-				}
-
-			} else if (workString.contains(channellistTAG)) {
+			// if (workString.contains(channelTAG)) {
+			// // <channel>...</channel>
+			// String temp = getInBetweenTAGs(channelTAG, channelCloseTAG,
+			// restString);
+			//
+			// if (temp != null) {
+			// Payload channel = getChannelBody(temp);
+			//
+			// if (channel != null) {
+			// return new Payload<Payload>(channelTAG, channel,
+			// channelCloseTAG);
+			// } else {
+			// return null;
+			// }
+			// }
+			//
+			// }
+			if (workString.contains(channellistTAG)) {
 				// <channellist></channellist>
 
 				return new Payload<String>(channellistTAG, "list", channellistTAGClose);
@@ -264,9 +274,9 @@ public class MessageBuilder<FromType,ToType> {
 
 				}
 
-			}else if(workString.contains(unsubscribeTAG)){
-				//<unsubscribe>[...]</unsubscribe>
-				
+			} else if (workString.contains(unsubscribeTAG)) {
+				// <unsubscribe>[...]</unsubscribe>
+
 				String temp = getInBetweenTAGs(unsubscribeTAG, unsubscribeTAGClose, restString);
 
 				if (temp != null) {
@@ -274,10 +284,35 @@ public class MessageBuilder<FromType,ToType> {
 					return new Payload<String>(unsubscribeTAG, temp, unsubscribeTAGClose);
 
 				}
-				
-			}else if(workString.contains(logoutTAG)){
+
+			} else if (workString.contains(logoutTAG)) {
 				return new Payload<String>(logoutTAG, "", logoutTAGClose);
 			}
+
+			else if (workString.contains(nickaddTAG)) {
+				// <subscribe>[ID]<subscribe>
+				String temp = getInBetweenTAGs(nickaddTAG, nickaddTAGClose, restString);
+
+				if (temp != null) {
+
+					return new Payload<String>(nickaddTAG, temp, nickaddTAGClose);
+
+				}
+
+			}
+			
+			 else if (workString.contains(nickleaveTAG)) {
+					// <subscribe>[ID]<subscribe>
+					String temp = getInBetweenTAGs(nickleaveTAG, nickleaveTAGClose, restString);
+
+					if (temp != null) {
+
+						return new Payload<String>(nickleaveTAG, temp, nickleaveTAGClose);
+
+					}
+
+				}
+
 		}
 		return null;
 
