@@ -17,31 +17,31 @@ public class InputStreamThread extends Thread {
 	private int clientID;
 
 	private boolean listen = true;
-	
+
 	private Locale lowercaseLocale = Locale.GERMANY;
-	
-	
+
 	private static String befehlsPraefix = "<";
 	private static String befehlsSuffix = ">";
-	
-	private String tagFrom = befehlsPraefix+"from"+befehlsSuffix;
-	private String tagFromClose = befehlsPraefix+"/from"+befehlsSuffix;
-	private String tagTo = befehlsPraefix+"to"+befehlsSuffix;
-	private String tagToClose = befehlsPraefix+"/to"+befehlsSuffix;
-	private String tagMessage = befehlsPraefix+"message"+befehlsSuffix;
-	private String tagMessageClose = befehlsPraefix+"/message"+befehlsSuffix;
-	private String tagControl = befehlsPraefix+"control"+befehlsSuffix;
-	private String tagControlClose = befehlsPraefix+"/control"+befehlsSuffix;
-	
+
+	private String tagFrom = befehlsPraefix + "from" + befehlsSuffix;
+	private String tagFromClose = befehlsPraefix + "/from" + befehlsSuffix;
+	private String tagTo = befehlsPraefix + "to" + befehlsSuffix;
+	private String tagToClose = befehlsPraefix + "/to" + befehlsSuffix;
+	private String tagMessage = befehlsPraefix + "message" + befehlsSuffix;
+	private String tagMessageClose = befehlsPraefix + "/message" + befehlsSuffix;
+	private String tagControl = befehlsPraefix + "control" + befehlsSuffix;
+	private String tagControlClose = befehlsPraefix + "/control" + befehlsSuffix;
+
 	private MessageBuilder payloadBuilder = new MessageBuilder();
-	
-	
-/**
- * Erstellt einen neuen Thread, der auf dem InputStream liest und prüft ob die übermittelte Nachricht dem {@code<message>}-Format entspricht.
- * Wenn nicht, werden die Nachrichten verworfen..
- * @param inStream
- * @param queue
- */
+
+	/**
+	 * Erstellt einen neuen Thread, der auf dem InputStream liest und prüft ob
+	 * die übermittelte Nachricht dem {@code<message>}-Format entspricht. Wenn
+	 * nicht, werden die Nachrichten verworfen..
+	 * 
+	 * @param inStream
+	 * @param queue
+	 */
 	public InputStreamThread(BufferedReader inStream, LinkedBlockingQueue queue) {
 
 		in = inStream;
@@ -55,191 +55,196 @@ public class InputStreamThread extends Thread {
 		// puffer..
 
 		String clientNachricht = "";
-		
-		
+
 		try {
 			clientNachricht = in.readLine();
-					
+
 		} catch (IOException e) {
-			//wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
-//			e.printStackTrace();
-//			listen=false;
+			// wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
+			// e.printStackTrace();
+			// listen=false;
 		}
-		
 
 		while (listen) {
 
 			
-			
-			Message<String, String> message = payloadBuilder.getFromString(clientNachricht);
-			
-			if(message != null){
-				input.add(message);
+			if (clientNachricht != null) {
+				System.out.println("C>\t" + clientNachricht);
+				Message<String, String> message = payloadBuilder.getFromString(clientNachricht);
+
+				if (message != null) {
+					input.add(message);
+				}
+
 			}
-						
 			try {
 				clientNachricht = in.readLine();
-				
-				 listen=false;
-				
+
 			} catch (IOException e) {
-				//wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
-				//z.b. wenn man ihn schliesst...
-//				e.printStackTrace();
+				// wenn aus irgendeinem grund der Stream nicht gelesen werden
+				// kann..
+				// z.b. wenn man ihn schliesst...
+				// e.printStackTrace();
 			}
-			
+
 		}
 	}
 
-//	/**
-//	 * Liefert die ID aus dem {@code<message>...</message>}-TAG oder {@code<coltrol>...</control>}-TAG.
-//	 * Da bereits schon vorher auf das ensprechende format getestet wurde, kann hier gewiss sein das es eines der beiden tags enthalten ist.
-//	 * @param clientNachricht
-//	 * @return Die Payload als Objekt
-//	 */
-//	private Payload getPayload(String clientNachricht) {
-//		
-//		String temp = clientNachricht.toLowerCase(lowercaseLocale);
-//		Payload payload=null;
-//		
-//		int startidex = 0;
-//		int startindexClose = 0;
-//		
-//		if(temp.contains(tagMessage)){
-//			
-//			startidex= temp.indexOf(tagMessage)+tagMessage.length();
-//			startindexClose = temp.indexOf(tagMessageClose);
-//			
-//			payload = new Payload(clientNachricht.substring(startidex, startindexClose));
-//			
-//			
-//		}else if(temp.contains(tagControl)){
-//			startidex = temp.indexOf(tagControl)+tagControl.length();
-//			startindexClose = temp.indexOf(tagControlClose);
-//			
-//			payload = new PayloadControl(clientNachricht.substring(startidex, startindexClose));
-//			
-//		}
-//		
-//		
-//		
-//		
-//		
-//		
-//		
-//		return null;
-//	}
-//
-//	/**
-//	 * Liefert die ID aus dem {@code<to>...</to>}-TAG.
-//	 * @param clientNachricht
-//	 * @return
-//	 */
-//	private int getToID(String clientNachricht) {
-//		
-//		
-//		String temp = clientNachricht.toLowerCase(lowercaseLocale);
-//		
-//		int startidex = temp.indexOf(tagTo)+tagTo.length();
-//		int startindexClose = temp.indexOf(tagToClose);
-//		
-//		
-//		return Integer.parseInt(clientNachricht.substring(startidex, startindexClose));
-//	}
-//
-//	/**
-//	 * Liefert die ID aus dem {@code<from>...</from>}-TAG. 
-//	 * @param clientNachricht
-//	 * @return
-//	 */
-//	private int getFromID(String clientNachricht) {
-//		String temp = clientNachricht.toLowerCase(lowercaseLocale);
-//		
-//		int startidex = temp.indexOf(tagFrom)+tagFrom.length();
-//		int startindexClose = temp.indexOf(tagFromClose);
-//		
-//		
-//		return Integer.parseInt(clientNachricht.substring(startidex, startindexClose));
-//	}
-//
-//	/**
-//	 * überprüft ob die Nachricht im {@code <message>}-Format ist
-//	 * @param clientNachricht
-//	 * @return true wenn im Format, false falls nicht
-//	 */
-//	private boolean isMessageFormat(String clientNachricht) {
-//		
-//		
-//		
-//		if(containsFromTAG(clientNachricht) && containsToTAG(clientNachricht) && containsPayload(clientNachricht)){
-//			return true;
-//		}
-//		
-//		return false;
-//	}
-//
-//	/**
-//	 * checkt ob der Übergebene String das {@code <message>}-TAG oder {@code <control>}-TAG enthält
-//	 * @param clientNachricht
-//	 * @return
-//	 */
-//	private boolean containsPayload(String clientNachricht) {
-//	boolean contain = false;
-//		
-//		String temp = clientNachricht.toLowerCase().trim();
-//		
-//		if(temp.contains(tagMessage) && temp.contains(tagMessageClose)){
-//			return true;
-//		}else if(temp.contains(tagControl) && temp.contains(tagControlClose)){
-//			return true;
-//		}
-//		
-//		return false;
-//	}
-//
-//	/**
-//	 * checkt ob der Übergebene String das {@code <to>}-TAG enthält
-//	 * @param clientNachricht
-//	 * @return
-//	 */
-//	private boolean containsToTAG(String clientNachricht) {
-//	
-//		
-//		String temp = clientNachricht.toLowerCase().trim();
-//		
-//		if(temp.contains(tagTo) && temp.contains(tagToClose)){
-//			return true;
-//		}
-//		
-//		return false;
-//	}
-//
-//	/**
-//	 * checkt ob der Übergebene String das {@code <from>}-TAG enthält
-//	 * @param clientNachricht
-//	 * @return
-//	 */
-//	private boolean containsFromTAG(String clientNachricht) {
-//		
-//		
-//		String temp = clientNachricht.toLowerCase().trim();
-//		
-//		if(temp.contains(tagFrom) && temp.contains(tagFromClose)){
-//			return true;
-//		}
-//		
-//		return false;
-//	}
-//
+	// /**
+	// * Liefert die ID aus dem {@code<message>...</message>}-TAG oder
+	// {@code<coltrol>...</control>}-TAG.
+	// * Da bereits schon vorher auf das ensprechende format getestet wurde,
+	// kann hier gewiss sein das es eines der beiden tags enthalten ist.
+	// * @param clientNachricht
+	// * @return Die Payload als Objekt
+	// */
+	// private Payload getPayload(String clientNachricht) {
+	//
+	// String temp = clientNachricht.toLowerCase(lowercaseLocale);
+	// Payload payload=null;
+	//
+	// int startidex = 0;
+	// int startindexClose = 0;
+	//
+	// if(temp.contains(tagMessage)){
+	//
+	// startidex= temp.indexOf(tagMessage)+tagMessage.length();
+	// startindexClose = temp.indexOf(tagMessageClose);
+	//
+	// payload = new Payload(clientNachricht.substring(startidex,
+	// startindexClose));
+	//
+	//
+	// }else if(temp.contains(tagControl)){
+	// startidex = temp.indexOf(tagControl)+tagControl.length();
+	// startindexClose = temp.indexOf(tagControlClose);
+	//
+	// payload = new PayloadControl(clientNachricht.substring(startidex,
+	// startindexClose));
+	//
+	// }
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	// return null;
+	// }
+	//
+	// /**
+	// * Liefert die ID aus dem {@code<to>...</to>}-TAG.
+	// * @param clientNachricht
+	// * @return
+	// */
+	// private int getToID(String clientNachricht) {
+	//
+	//
+	// String temp = clientNachricht.toLowerCase(lowercaseLocale);
+	//
+	// int startidex = temp.indexOf(tagTo)+tagTo.length();
+	// int startindexClose = temp.indexOf(tagToClose);
+	//
+	//
+	// return Integer.parseInt(clientNachricht.substring(startidex,
+	// startindexClose));
+	// }
+	//
+	// /**
+	// * Liefert die ID aus dem {@code<from>...</from>}-TAG.
+	// * @param clientNachricht
+	// * @return
+	// */
+	// private int getFromID(String clientNachricht) {
+	// String temp = clientNachricht.toLowerCase(lowercaseLocale);
+	//
+	// int startidex = temp.indexOf(tagFrom)+tagFrom.length();
+	// int startindexClose = temp.indexOf(tagFromClose);
+	//
+	//
+	// return Integer.parseInt(clientNachricht.substring(startidex,
+	// startindexClose));
+	// }
+	//
+	// /**
+	// * überprüft ob die Nachricht im {@code <message>}-Format ist
+	// * @param clientNachricht
+	// * @return true wenn im Format, false falls nicht
+	// */
+	// private boolean isMessageFormat(String clientNachricht) {
+	//
+	//
+	//
+	// if(containsFromTAG(clientNachricht) && containsToTAG(clientNachricht) &&
+	// containsPayload(clientNachricht)){
+	// return true;
+	// }
+	//
+	// return false;
+	// }
+	//
+	// /**
+	// * checkt ob der Übergebene String das {@code <message>}-TAG oder {@code
+	// <control>}-TAG enthält
+	// * @param clientNachricht
+	// * @return
+	// */
+	// private boolean containsPayload(String clientNachricht) {
+	// boolean contain = false;
+	//
+	// String temp = clientNachricht.toLowerCase().trim();
+	//
+	// if(temp.contains(tagMessage) && temp.contains(tagMessageClose)){
+	// return true;
+	// }else if(temp.contains(tagControl) && temp.contains(tagControlClose)){
+	// return true;
+	// }
+	//
+	// return false;
+	// }
+	//
+	// /**
+	// * checkt ob der Übergebene String das {@code <to>}-TAG enthält
+	// * @param clientNachricht
+	// * @return
+	// */
+	// private boolean containsToTAG(String clientNachricht) {
+	//
+	//
+	// String temp = clientNachricht.toLowerCase().trim();
+	//
+	// if(temp.contains(tagTo) && temp.contains(tagToClose)){
+	// return true;
+	// }
+	//
+	// return false;
+	// }
+	//
+	// /**
+	// * checkt ob der Übergebene String das {@code <from>}-TAG enthält
+	// * @param clientNachricht
+	// * @return
+	// */
+	// private boolean containsFromTAG(String clientNachricht) {
+	//
+	//
+	// String temp = clientNachricht.toLowerCase().trim();
+	//
+	// if(temp.contains(tagFrom) && temp.contains(tagFromClose)){
+	// return true;
+	// }
+	//
+	// return false;
+	// }
+	//
 	/**
-	 * Sorgt dafür das der Stream nicht mehr weiter liest und versucht ihn zu beenden
+	 * Sorgt dafür das der Stream nicht mehr weiter liest und versucht ihn zu
+	 * beenden
 	 */
 	public void stopListen() {
 		listen = false;
 
-		
-
 	}
-	
 
 }

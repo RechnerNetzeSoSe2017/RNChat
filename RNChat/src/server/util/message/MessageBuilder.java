@@ -269,7 +269,7 @@ public class MessageBuilder<FromType, ToType> {
 			if (workString.contains(channellistTAG)) {
 				// <channellist></channellist>
 
-				return new Payload<String>(channellistTAG, "list", channellistTAGClose);
+				return new Payload<String>(channellistTAG, "", channellistTAGClose);
 
 			} else if (workString.contains(subscribeTAG)) {
 				// <subscribe>[ID]<subscribe>

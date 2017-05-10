@@ -13,6 +13,15 @@ public class PayloadBuilderTest {
 	
 	private MessageBuilder payloadBuilder = new MessageBuilder();
 	
+	
+	private String channellistCommand="<from>g</from><to>g</to><control><channellist></channellist></control>";
+	private String subscribeCommand="<from>g</from><to>g</to><control><subscribe>hallo Test</subscribe></control>";
+	private String unsubscribeCommand="<from>g</from><to>g</to><control><subscribe>hallo Test</subscribe></control>";
+	private String logoutCommand="<from>g</from><to>g</to><control><logout></logout></control>";
+	
+	private String testnachricht="<from>g</from><to>g</to><message>Testnachricht</message>";
+	
+	
 	@Test
 	public void testFromString(){
 		
@@ -43,6 +52,26 @@ public class PayloadBuilderTest {
 		
 		assertTrue(pbSubscribe.toString().equals("<from>g</from><to>g</to><control><subscribe>13</subscribe></control>"));
 		
+		
+		Message msg2 = payloadBuilder.getFromString(channellistCommand);
+		assertNotNull(msg2);
+		System.out.println(msg2);
+		assertTrue(channellistCommand.equals(msg2.toString()));
+		
+		Message msg3 = payloadBuilder.getFromString(subscribeCommand);
+		assertNotNull(msg3);
+		System.out.println(msg3);
+		assertTrue(subscribeCommand.equals(msg3.toString()));
+		
+		Message msg4 = payloadBuilder.getFromString(unsubscribeCommand);
+		assertNotNull(msg4);
+		System.out.println(msg4);
+		assertTrue(unsubscribeCommand.equals(msg4.toString()));
+		
+		Message msg5 = payloadBuilder.getFromString(logoutCommand);
+		assertNotNull(msg5);
+		System.out.println(msg5);
+		assertTrue(logoutCommand.equals(msg5.toString()));
 //		
 //		//unsubscribe muss eine ID enthalten
 //		Payload pbUnsubscribe = payloadBuilder.getFromString("<control><channel><unsubscribe></unsubscribe></channel></control>").getPayload();
