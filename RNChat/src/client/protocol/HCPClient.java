@@ -148,9 +148,21 @@ public class HCPClient extends Thread {
 					log("<eoh>");
 					out.println("<eoh>");
 				}
+				
+				
 
 				if (communicate) {
 
+					try {
+						//server sagt Start message-format now!
+						antwort=in.readLine();
+						log(antwort);
+						
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					// ab hier ist wieder provisorisch...
 					outputThread = new OutputStreamThread(out, outputQueue);
 					outputThread.start();

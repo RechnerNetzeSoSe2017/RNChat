@@ -401,7 +401,7 @@ public class HPCServer implements Runnable {
 		inputThread.start();
 
 		// testausgabe
-		output.add(new Message(serverName, clientName, new Payload("","Welckome to here","")));
+//		output.add(new Message(serverName, clientName, new Payload("","Welckome to here","")));
 
 		Message<String,String> msg = null;
 
