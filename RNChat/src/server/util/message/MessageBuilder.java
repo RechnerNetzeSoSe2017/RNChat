@@ -311,6 +311,17 @@ public class MessageBuilder<FromType, ToType> {
 		
 		return msg;
 	}
+	public Message getchannellist(FromType from, ToType to){
+		
+		Payload channellist = new Payload<>(channellistTAG, "", channellistTAGClose);
+		Payload control = new Payload<>(controlTAG, channellist, controlTAGClose);
+		
+		Message msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+		
+		
+	}
 	
 	private Payload getControlBody(String restString) {
 		// <control>[hier ist restString]</control>

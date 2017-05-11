@@ -134,6 +134,7 @@ public class HCPClient extends Thread {
 				String antwort = null;
 				try {
 					antwort = in.readLine();
+					log(antwort);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					// e1.printStackTrace();
@@ -143,6 +144,9 @@ public class HCPClient extends Thread {
 					communicate = false;
 					log("nickname war nicht OK");
 					out.println("<bye>");
+				}else{
+					log("<eoh>");
+					out.println("<eoh>");
 				}
 
 				if (communicate) {
@@ -155,6 +159,8 @@ public class HCPClient extends Thread {
 
 					while (!socket.isClosed() && communicate) {
 						String clientString = null;
+						
+						outputQueue.add(messageBuilder.getchannellist(nickname, "Server").toString());
 						try {
 							
 							clientString = in.readLine();

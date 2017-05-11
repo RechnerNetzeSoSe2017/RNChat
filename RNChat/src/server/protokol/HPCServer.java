@@ -244,6 +244,8 @@ public class HPCServer implements Runnable {
 		String antwort = "h";
 
 		boolean endOfHeader = false;
+		
+		int fehler = 0;
 
 		// so lange vom client lesen bis er seinen header beendet.
 		while (!closeConnection && !endOfHeader) {
@@ -253,12 +255,17 @@ public class HPCServer implements Runnable {
 				antwort = antwort.trim();
 				antwort = antwort.toLowerCase(lowercaseLocale);
 				out.println(antwort);
-			} catch (IOException e) {
+			}catch(SocketException se){
+				closeConnection();
+				
+			} 
+			
+			catch (IOException e) {
 				// Client hat einfach die verbindung abgebrochen
 				e.printStackTrace();
 			}
 
-			if (checkHeader(antwort)) {
+			if (!closeConnection && checkHeader(antwort)) {
 
 				headerErrorCount = 0;
 
