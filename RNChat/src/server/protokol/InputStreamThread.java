@@ -46,6 +46,7 @@ public class InputStreamThread extends Thread {
 
 		in = inStream;
 		input = queue;
+		
 
 	}
 

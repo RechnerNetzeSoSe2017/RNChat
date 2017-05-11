@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javafx.util.Pair;
 import server.server.Chatserver;
@@ -93,6 +95,9 @@ public class HPCServer implements Runnable {
 	private String messageTAG = "<message>";
 	
 	private Nameservice nslookup=Nameservice.getInstance("Chatsserver");
+	
+	private int timeoutattemps = 0;
+	private int maxtimeoutAttemps=3;
 
 	public HPCServer(Socket socket) {
 
@@ -114,6 +119,13 @@ public class HPCServer implements Runnable {
 
 		// ein Testeintrag
 		optionsListing.put("Encryption", "NONE");
+		
+		try {
+			this.socket.setKeepAlive(true);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+		}
 
 	}
 
@@ -138,10 +150,11 @@ public class HPCServer implements Runnable {
 
 		try {
 			socket.setSoTimeout(socketTimeout);
-		} catch (SocketException e1) {
+		} 
+		catch (SocketException e1) {
 			// wenn auf dem darunter liegendem layer ein timeout probleme
 			// verursacht..
-			e1.printStackTrace();
+//			e1.printStackTrace();
 
 		}
 
@@ -244,6 +257,7 @@ public class HPCServer implements Runnable {
 		String antwort = "h";
 
 		boolean endOfHeader = false;
+		boolean setNickname = false;
 		
 		int fehler = 0;
 
@@ -296,7 +310,11 @@ public class HPCServer implements Runnable {
 				
 				else if (antwort.startsWith("<eoh>")) {
 					log("client <eoh>");
-					endOfHeader = true;
+					if(setNickname){
+						endOfHeader = true;
+					}else{
+						out.println("<nok>Nickname not set");
+					}
 				}
 				
 				
@@ -309,9 +327,10 @@ public class HPCServer implements Runnable {
 						if(nslookup.addName(value.trim())){
 							out.println("<ok>");
 							clientName=value;
+							setNickname=true;
 							
 						}else{
-							out.println("<nok>");
+							out.println("<nok>Nickname nicht verfuegbar");
 						}
 					}
 					
@@ -337,6 +356,26 @@ public class HPCServer implements Runnable {
 			}
 
 		}
+
+	}
+	private String readfromClient(){
+		
+		String temp=null;
+		
+		try {
+			temp=in.readLine();
+		}catch(SocketTimeoutException ste){
+			timeoutattemps++;
+			if(timeoutattemps>=maxtimeoutAttemps){
+				closeConnection=true;
+				closeConnection();
+			}
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return temp;
 
 	}
 
@@ -477,12 +516,12 @@ public class HPCServer implements Runnable {
 				}
 				
 				
-				
+				msg=null;
 
 			}
 
 			try {
-				msg = input.take();
+				msg = input.poll(3, TimeUnit.SECONDS);//take();
 			} catch (InterruptedException e) {
 				// wenn interrupted beim warten auf elemente
 				e.printStackTrace();
