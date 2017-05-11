@@ -8,16 +8,24 @@ import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import client.gui.UIController;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TextArea;
+import javafx.util.Pair;
 import server.protokol.InputStreamThread;
 import server.protokol.OutputStreamThread;
+import server.util.message.Message;
+import server.util.message.MessageBuilder;
 
 public class HCPClient extends Thread {
 
-	// ---------------------------------temporäre hilfsvariablen..-----------
+	// --------------------------------------------
 
 	private UIController uiController;
 	private LinkedBlockingQueue<String> outputQueue = new LinkedBlockingQueue<>();
@@ -50,7 +58,15 @@ public class HCPClient extends Thread {
 
 	private OutputStreamThread<String> outputThread;
 	private InputStreamThread inputThread;
-	private boolean communicate=true;
+	private boolean communicate = true;
+
+	private String nickname = "";
+	private ObservableList raumliste;
+
+	private HashMap<String, TextArea> chatraumFenster = new HashMap<>();
+	private HashMap<String,ObservableList> nicknameFenster = new HashMap<>(); 
+
+	private MessageBuilder<String, String> messageBuilder = new MessageBuilder<String, String>();
 
 	/**
 	 * erstellt eine neue Verbindung Mit dem Server der unter den angegebenen
@@ -114,22 +130,57 @@ public class HCPClient extends Thread {
 				// hat..
 				// out.println(befehlEOH);
 
-				// ab hier ist wieder provisorisch...
-				outputThread = new OutputStreamThread(out, outputQueue);
-				outputThread.start();
+				out.println("<nickname>" + nickname);
+				String antwort = null;
+				try {
+					antwort = in.readLine();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					// e1.printStackTrace();
+				}
 
-				// inputThread = new InputStreamThread(in, queue)
+				if (antwort != null && antwort.equals("<nok>")) {
+					communicate = false;
+					log("nickname war nicht OK");
+					out.println("<bye>");
+				}
 
-				while (!socket.isClosed() && communicate) {
-					try {
-						log(in.readLine());
-					}catch(SocketException se){
-						communicate=false;
-					}
+				if (communicate) {
 
-					catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					// ab hier ist wieder provisorisch...
+					outputThread = new OutputStreamThread(out, outputQueue);
+					outputThread.start();
+
+					// inputThread = new InputStreamThread(in, queue)
+
+					while (!socket.isClosed() && communicate) {
+						String clientString = null;
+						try {
+							
+							clientString = in.readLine();
+							
+							if(clientString!=null){
+								Message msg = messageBuilder.getFromString(clientString);
+								
+								if(msg!=null){
+									
+									
+									
+									
+								}
+								
+							}
+							
+							
+						} catch (SocketException se) {
+//							communicate = false;
+							clientString=null;
+						}
+
+						catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 
@@ -140,6 +191,8 @@ public class HCPClient extends Thread {
 		}
 
 	}
+
+	// private String
 
 	private void readServerHeader() {
 		String antwort = "";
@@ -231,8 +284,11 @@ public class HCPClient extends Thread {
 
 	}
 
-	public void sendMessage(String message, int receiverID) {
-		outputQueue.add(message);
+	public void sendMessage(String message, String receiverID) {
+		
+		Message msg = messageBuilder.newMessage(nickname, "Server", message);
+		
+		outputQueue.add(msg.toString());
 	}
 
 	/**
@@ -248,11 +304,84 @@ public class HCPClient extends Thread {
 		return befehlsPraefix + "to" + befehlsSuffix + idReceiver + befehlsPraefix + "/to" + befehlsSuffix;
 	}
 
+	/**
+	 * Schliesst die Verbindung
+	 */
 	public void closeConnection() {
 		if (outputThread != null) {
 			outputThread.stopSend();
 		}
 
 	}
+
+	/**
+	 * setzt den nicknamen für die zeit dieser sitzung. Es wird versucht sich
+	 * mit diesem Namen mit dem Server zu verbinden
+	 * 
+	 * @param nickname
+	 */
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+
+	}
+
+	/**
+	 * Erwartet die ObservableList eines ListViews wo die chaträume eingetragen
+	 * werden können..
+	 * 
+	 * @param roomlist
+	 */
+	public void setRoomlist(ObservableList roomlist) {
+		raumliste = roomlist;
+	}
+
+	/**
+	 * fügt das ziel TextArea hinzu, damit ankommende Nachrichten auf dieser
+	 * TextArea angezeigt werden können.
+	 * 
+	 * @param raumname
+	 * @param area
+	 */
+	public void setTextareaForRoom(String raumname, TextArea area) {
+		chatraumFenster.put(raumname, area);
+	}
+	/**
+	 * setzt die nicklisten damit die befüllt werden können
+	 * @param raumname
+	 * @param listview
+	 */
+	public void setListViewForNicklist(String raumname,ObservableList listview){
+		nicknameFenster.put(raumname, listview);
+	}
+
+	public void removeTextArea(String name) {
+		chatraumFenster.remove(name);
+	}
+	
+
+	/**
+	 * Teilt dem Server mit das ein bestimmter Raum subscribed werden soll
+	 * 
+	 * @param name
+	 */
+	public void subscribe(String name) {
+
+		Message msg = messageBuilder.getSubscribe(nickname, "Server", name);
+
+		outputQueue.add(msg.toString());
+
+	}
+
+	/**
+	 * Teilt dem Server mit das ein Bestimmter Raum deabboniert werden soll
+	 * 
+	 * @param name
+	 */
+	public void unsubscribe(String name) {
+		Message msg = messageBuilder.getUnsubscribe(nickname, "Server", name);
+		outputQueue.add(msg.toString());
+	}
+	
+	
 
 }

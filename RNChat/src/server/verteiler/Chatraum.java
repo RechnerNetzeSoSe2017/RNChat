@@ -35,6 +35,8 @@ public class Chatraum extends Thread {
 	private String subscribeTAG ="<subscribe>";
 	private String unsubscribeTAG="<unsubscribe>";
 	
+	MessageBuilder messageBuilder = new MessageBuilder<>();
+	
 	public Chatraum(String name) {
 		if(!name.equals("")){
 			this.name=name;
@@ -135,6 +137,11 @@ public class Chatraum extends Thread {
 //			client.sendMessage(new Message(id, client.getID(), new Payload(welcomeMessage())));
 			
 		}
+		
+		Message msg = messageBuilder.getNickadd(name, name, client.getClientName());
+		
+		nachrichten.add(msg);
+		
 		return true;
 	}
 	

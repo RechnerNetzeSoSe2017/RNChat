@@ -284,10 +284,16 @@ public class HPCServer implements Runnable {
 
 					closeConnection();
 
-				} else if (antwort.startsWith("<eoh>")) {
+				}
+				
+				
+				else if (antwort.startsWith("<eoh>")) {
 					log("client <eoh>");
 					endOfHeader = true;
-				}else if(antwort.contains("<nickname>")){
+				}
+				
+				
+				else if(antwort.contains("<nickname>")){
 					int lastpeak = antwort.lastIndexOf(">");
 
 					String value = antwort.substring(lastpeak + 1);

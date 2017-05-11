@@ -153,27 +153,27 @@ public class MessageBuilder<FromType, ToType> {
 		return null;
 	}
 
-	/**
-	 * erstellt eine neue Payload, die alle hirarchien
-	 * control/channel/subscribe/id[..] erstellt..
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public Payload newSubscribe(int id) {
-		// zuerst neue ID
-		// dann neue subscribe
-		// dann neue channel
-		// dann neue control
-		// dann fertig
-
-		Payload idPL = new Payload<String>("<id>", "" + id, "</id>");
-		Payload subscribePL = new Payload<Payload>("<subscribe>", idPL, "</subscribe>");
-		Payload channelPL = new Payload<Payload>("<channel>", subscribePL, "</channel>");
-		Payload controlPL = new Payload<Payload>("<control>", channelPL, "</control>");
-
-		return controlPL;
-	}
+//	/**
+//	 * erstellt eine neue Payload, die alle hirarchien
+//	 * control/channel/subscribe/id[..] erstellt..
+//	 * 
+//	 * @param id
+//	 * @return
+//	 */
+//	public Payload newSubscribe(int id) {
+//		// zuerst neue ID
+//		// dann neue subscribe
+//		// dann neue channel
+//		// dann neue control
+//		// dann fertig
+//
+//		Payload idPL = new Payload<String>("<id>", "" + id, "</id>");
+//		Payload subscribePL = new Payload<Payload>("<subscribe>", idPL, "</subscribe>");
+//		Payload channelPL = new Payload<Payload>("<channel>", subscribePL, "</channel>");
+//		Payload controlPL = new Payload<Payload>("<control>", channelPL, "</control>");
+//
+//		return controlPL;
+//	}
 
 	/**
 	 * Baut ein Message-Objekt das die Nachricht enthält, ob die Subscribtion
@@ -278,6 +278,40 @@ public class MessageBuilder<FromType, ToType> {
 		
 		return msg;
 	}
+	/**
+	 * Erstellt eine subscribe-Message
+	 * @param from
+	 * @param to
+	 * @param name
+	 * @return
+	 */
+	public Message getSubscribe(FromType from, ToType to,String name){
+		
+		Payload<String> subscribe = new Payload<>(subscribeTAG, name, subscribeTAGClose);
+		Payload<Payload> control = new Payload<>(controlTAG, subscribe, controlTAGClose);
+		
+		Message msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+	}
+	
+	/**
+	 * Erstellt eine unsubscribe-Message
+	 * @param from
+	 * @param to
+	 * @param name
+	 * @return
+	 */
+	public Message getUnsubscribe(FromType from, ToType to,String name){
+		
+		Payload<String> subscribe = new Payload<>(unsubscribeTAG, name, unsubscribeTAGClose);
+		Payload<Payload> control = new Payload<>(controlTAG, subscribe, controlTAGClose);
+		
+		Message msg = new Message<FromType, ToType>(from, to, control);
+		
+		return msg;
+	}
+	
 	private Payload getControlBody(String restString) {
 		// <control>[hier ist restString]</control>
 		if (restString != null) {
