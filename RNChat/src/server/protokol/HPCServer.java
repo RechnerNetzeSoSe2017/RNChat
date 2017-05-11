@@ -437,7 +437,7 @@ public class HPCServer implements Runnable {
 					
 					Payload control = plist.get(0);
 					
-					log("client message>\t"+control.toString());
+//					log("client message>\t"+control.toString());
 					
 					if(control.getPrefix().contains(channellistTAG)){
 						ArrayList<Pair<Integer, String>> li = verteiler.getRoomList();
