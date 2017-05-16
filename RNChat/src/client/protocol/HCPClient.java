@@ -306,7 +306,8 @@ public class HCPClient extends Thread {
 		
 		Message msg = messageBuilder.newMessage(nickname, "Server", message);
 		
-		outputQueue.add(msg.toString());
+//		outputQueue.add(msg.toString());
+		outputQueue.add(message);
 	}
 
 	/**
@@ -329,6 +330,7 @@ public class HCPClient extends Thread {
 		if (outputThread != null) {
 			outputThread.stopSend();
 		}
+		//hier die liste .notify?
 
 	}
 

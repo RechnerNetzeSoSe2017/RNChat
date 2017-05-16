@@ -111,7 +111,7 @@ public class UIController implements Initializable{
 				String temp = inputArea.getText();
 				
 				hcpClient.sendMessage(temp, "Server");
-				messageArea.appendText(temp);
+				messageArea.appendText("\n"+temp);
 				
 				inputArea.setText("");
 				
