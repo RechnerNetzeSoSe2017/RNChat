@@ -29,6 +29,7 @@ public class OutputStreamThread<E> extends Thread {
 			
 			try {
 				msg = output.take();
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				//hier vielleicht die verbindnug beenden?
@@ -47,6 +48,7 @@ public class OutputStreamThread<E> extends Thread {
 	
 	public void stopSend(){
 		shutdown=true;
+		output.notifyAll();
 		interrupt();
 	}
 }
