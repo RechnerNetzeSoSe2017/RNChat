@@ -141,7 +141,7 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 		for(Chatraum raum : raumListe){
 			raum.stopWorking();
 		}
-		zuVerteilendeNachrichten.notifyAll();
+//		zuVerteilendeNachrichten.notifyAll();
 		interrupt();
 		
 		

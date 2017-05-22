@@ -240,8 +240,8 @@ public class HPCServer implements Runnable {
 //			e.printStackTrace();
 		}
 
-		input.notifyAll();
-		output.notifyAll();
+//		input.notifyAll();
+//		output.notifyAll();
 		
 		try {
 			socket.close();
