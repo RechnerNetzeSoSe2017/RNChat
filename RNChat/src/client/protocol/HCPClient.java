@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -22,6 +23,7 @@ import server.protokol.InputStreamThread;
 import server.protokol.OutputStreamThread;
 import server.util.message.Message;
 import server.util.message.MessageBuilder;
+import server.util.message.Payload;
 
 public class HCPClient extends Thread {
 
@@ -49,6 +51,17 @@ public class HCPClient extends Thread {
 
 	// <MESSAGE>-Format
 	// steht in den Methoden
+	private String controlTag="<control>";
+	private String messageTag="<message>";
+	private String channellistTAG = "<channel>";
+	private String channelAddTAG="<add>";
+	private String subscribeTAG="<subscribe>";
+	private String okTAG="<ok>";
+	private String nokTAG="<nok>";
+	private String unsubscribeTAG="<unsubscribe>";
+	private String nickAddTAG="<nickadd>";
+	private String nickLeaveTAG="<nickleave>";
+	
 
 	// -----------------------------------------------------
 
@@ -169,10 +182,11 @@ public class HCPClient extends Thread {
 
 					// inputThread = new InputStreamThread(in, queue)
 
+					outputQueue.add(messageBuilder.getchannellist(nickname, "Server").toString());
 					while (!socket.isClosed() && communicate) {
 						String clientString = null;
 						
-						outputQueue.add(messageBuilder.getchannellist(nickname, "Server").toString());
+						
 						try {
 							
 							clientString = in.readLine();
@@ -181,9 +195,38 @@ public class HCPClient extends Thread {
 								log(clientString);
 								Message msg = messageBuilder.getFromString(clientString);
 								
+								//ab hier werden die Nachrichten verarbeitet
 								if(msg!=null){
 									
+									List<Payload> plist = msg.getPayload().getPayloadList();
+									Payload control=plist.get(0);
 									
+System.out.println("msg != null payload ist: "+control.toString());
+									
+									//es ist ein <control> TAG
+									if(msg.getPayload().getPrefix().equals(controlTag)){
+									
+										
+										//wenn <control><channel>..</channel></control>
+										if(control.getPrefix().contains(channellistTAG)){
+
+											plist=control.getPayloadList();
+											Payload add=plist.get(0);
+System.out.println("sollte <control><channel>.. sein.  ..  lautet: "+add.toString());											
+											//wenn ..<channel>   <add>[name]</add>   </channel>...
+											if(add.getPrefix().contains(channelAddTAG)){
+												plist=add.getPayloadList();
+												Payload name = plist.get(0);
+System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
+												uiController.addToChannellist(name.toString());
+											}
+											
+											
+										}
+										
+										
+										
+									}
 									
 									
 								}

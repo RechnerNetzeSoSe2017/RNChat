@@ -225,6 +225,11 @@ public class UIController implements Initializable{
 		messageArea.appendText(message+"\n");
 		
 	}
+	public void addToChannellist(String channel){
+		if(channel!=null){
+			raumlisteLV.getItems().add(channel);
+		}
+	}
 	
 	private void connectToServer(){
 		String ip = serverIPTF.getText();

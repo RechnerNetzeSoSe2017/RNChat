@@ -85,7 +85,7 @@ public class HPCServer implements Runnable {
 
 	// erlaubt es dem client Nachrichten die er an sich selbst addressiert
 	// wieder zu empfangen.. nur für testzwecke
-	private static boolean loopback = true;
+	private static boolean loopback = false;
 	
 	private Locale lowercaseLocale = Locale.GERMANY;
 	private MessageBuilder messageBuilder = new MessageBuilder();
