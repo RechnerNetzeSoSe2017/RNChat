@@ -55,7 +55,7 @@ public class InputStreamThread extends Thread {
 		// liest, checkt ob im <message>-format und legt die message in den
 		// puffer..
 
-		String clientNachricht = "";
+		String clientNachricht = null;
 
 		try {
 			clientNachricht = in.readLine();
@@ -64,6 +64,7 @@ public class InputStreamThread extends Thread {
 			// wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
 			// e.printStackTrace();
 			// listen=false;
+			clientNachricht=null;
 		}
 
 		while (listen) {
