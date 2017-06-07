@@ -178,6 +178,7 @@ public class HCPClient extends Thread {
 							clientString = in.readLine();
 							
 							if(clientString!=null){
+								log(clientString);
 								Message msg = messageBuilder.getFromString(clientString);
 								
 								if(msg!=null){
