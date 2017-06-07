@@ -79,11 +79,12 @@ public class InputStreamThread extends Thread {
 				if (message != null) {
 					input.add(message);
 					System.out.println("die geparste nachricht: "+message.toString());
-					message=null;
+					clientNachricht=null;
 				}
 
 			}
 			try {
+				
 				clientNachricht = in.readLine();
 
 			} catch (IOException e) {
