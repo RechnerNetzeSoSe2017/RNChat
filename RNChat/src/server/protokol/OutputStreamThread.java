@@ -35,11 +35,13 @@ public class OutputStreamThread<E> extends Thread {
 				//hier vielleicht die verbindnug beenden?
 //				e.printStackTrace();
 //				shutdown=true;
+				msg=null;
 				continue;
 			}
 			
 			if(!shutdown && msg != null){
 				out.println(msg);
+				msg=null;
 			}
 			
 		}
