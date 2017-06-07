@@ -59,6 +59,7 @@ public class InputStreamThread extends Thread {
 
 		try {
 			clientNachricht = in.readLine();
+			System.out.println("Nachricht vom Client> "+clientNachricht);
 
 		} catch (IOException e) {
 			// wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
