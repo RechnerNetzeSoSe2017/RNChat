@@ -92,6 +92,7 @@ System.out.println("inputstreamthread, run> die geparste nachricht: "+message.to
 				// kann..
 				// z.b. wenn man ihn schliesst...
 				// e.printStackTrace();
+				clientNachricht=null;
 			}
 
 		}
