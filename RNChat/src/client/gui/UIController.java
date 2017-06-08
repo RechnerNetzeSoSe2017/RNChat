@@ -2,6 +2,7 @@ package client.gui;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
@@ -331,10 +332,12 @@ public class UIController implements Initializable{
 	public void removeNickfromNicklist(String raumname, String nickname){
 		
 		if(raumname != null && nickname != null){
-			
+
 			if(raumname.equals(raum1Name)){
 				
+				
 				raum1LV.getItems().remove(nickname);
+				
 				
 				
 			}else if(raumname.equals(raum2Name)){
