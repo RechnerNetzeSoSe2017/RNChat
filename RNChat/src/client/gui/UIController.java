@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 import client.protocol.HCPClient;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -332,10 +333,13 @@ public class UIController implements Initializable{
 	public void removeNickfromNicklist(String raumname, String nickname){
 		
 		if(raumname != null && nickname != null){
-
+			
 			if(raumname.equals(raum1Name)){
 				
-				
+//				ObservableList<String> users = raum1LV.getItems();
+//				users.remove(nickname);
+//				raum1LV.getItems().clear();
+//				raum1LV.getItems().addAll(users);
 				raum1LV.getItems().remove(nickname);
 				
 				
