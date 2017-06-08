@@ -110,8 +110,11 @@ public class UIController implements Initializable{
 			public void handle(ActionEvent event) {
 				String temp = inputArea.getText();
 				
-				hcpClient.sendMessage(temp, "Server");
-				messageArea.appendText("\n"+temp);
+//				int beginIndex = temp.indexOf("<>");
+				String[] blah = temp.split("<>");
+				
+				hcpClient.sendMessage(blah[1], blah[0]);
+				messageArea.appendText(temp);
 				
 				inputArea.setText("");
 				
@@ -120,15 +123,15 @@ public class UIController implements Initializable{
 		
 		
 		
-		Menu menuConnect = new Menu("Connect");
-		MenuItem connToServer = new MenuItem("connect to Server..");
+		Menu menuConnect = new Menu("Datei");
+		MenuItem connToServer = new MenuItem("beenden");
 		
 		menuConnect.getItems().add(connToServer);
 		
 		menubar.getMenus().add(menuConnect);
 		
 		//eventlistener für den menüpunkt "connect To Server.."
-		connToServer.setOnAction(actionEvent -> {});
+		connToServer.setOnAction(actionEvent -> {beenden();});
 		
 		disconnectB.setDisable(true);
 		
@@ -137,35 +140,43 @@ public class UIController implements Initializable{
 		joinB.setOnAction(actionEvent -> {abboniereChannel();});
 		leaveB.setOnAction(actionEvent ->{deabboniereChannel();});
 		
-		raum1Senden.setOnAction(actionEvent ->{
+		raum1Senden.setOnAction(actionEvent ->{raum1Senden();});
+		
+		raum2Senden.setOnAction(actionEvent ->{raum2Senden();});
+		
+//		messageArea.add
+		
+		
+		
+	}
+	private void beenden() {
+		disconnect();
+		System.exit(0);
+		
+	}
+	private void raum1Senden(){
+		if(raum1Besetzt){
+			String nachricht = raum1TF.getText();
 			
-			if(raum1Besetzt){
-				String nachricht = raum1TF.getText();
-				
-				raum1TF.setText("");
-				
-				hcpClient.sendMessage(nachricht, raum1Name);
-				
-				
-			}
+			raum1TF.setText("");
 			
-		});
-		raum2Senden.setOnAction(actionEvent ->{
+			hcpClient.sendMessage(nachricht, raum1Name);
 			
-			if(raum2Besetzt){
+			
+		}
+	}
+	private void raum2Senden(){
+		if(raum2Besetzt){
 			String nachricht = raum2TF.getText();
+			
 			
 			raum2TF.setText("");
 			
 			hcpClient.sendMessage(nachricht, raum2Name);
 			
 			}
-			
-		});
-		
-		
-		
 	}
+	
 	private void deabboniereChannel() {
 		String name = raumlisteLV.getSelectionModel().getSelectedItem();
 		
@@ -199,12 +210,14 @@ public class UIController implements Initializable{
 				raum1TA.clear();
 				hcpClient.setTextareaForRoom(name, raum1TA);
 				raum1LV.getItems().clear();
+				raum1LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum1LV.getItems());
 				raum1Name=name;
 			}else if(!raum2Besetzt){
 				raum2TA.clear();
 				hcpClient.setTextareaForRoom(name, raum2TA);
 				raum2LV.getItems().clear();
+				raum2LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum2LV.getItems());
 				raum2Name=name;
 			}
@@ -217,14 +230,48 @@ public class UIController implements Initializable{
 		
 		
 	}
+	
+	/**
+	 * Gibt diese Instanz des Controllers zurück --> Singelton-Pattern
+	 * @return
+	 */
 	public static UIController getInstance(){
 		return instance;
 	}
+	/**
+	 * fügt einfach nur den text zur konsole hinzu
+	 * @param message
+	 * @param id
+	 */
 	public void message(String message, int id){
 		
 		messageArea.appendText(message+"\n");
 		
 	}
+	
+	/**
+	 * Bekommt eine Nachricht und fügt sie an das richtige tabfenser an.
+	 * @param tabname
+	 * @param nachricht
+	 */
+	public void messageToChat(String tabname, String absender, String nachricht){
+		
+		
+		
+		if(tabname.equals(raum1Name)){
+			raum1TA.appendText(nachricht);
+		}
+		else if(tabname.equals(raum2Name)){
+			raum2TA.appendText(nachricht);
+		}
+		
+		
+	}
+	
+	/**
+	 * Fügt einem Namen der Channelliste hinzu
+	 * @param channel
+	 */
 	public void addToChannellist(String channel){
 		if(channel!=null){
 			raumlisteLV.getItems().add(channel);
@@ -248,6 +295,7 @@ public class UIController implements Initializable{
 		
 	}
 	private void disconnect(){
+		
 		hcpClient.closeConnection();
 		disconnectB.setDisable(true);
 		connectB.setDisable(false);

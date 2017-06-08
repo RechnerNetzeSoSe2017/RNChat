@@ -48,6 +48,7 @@ public class Verteiler<ID,MessageFrom,MessageTo> extends Thread {
 			
 			try {
 				msg=zuVerteilendeNachrichten.take();
+System.out.println("verteiler,run> nachricht wird verteilt: "+msg);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();

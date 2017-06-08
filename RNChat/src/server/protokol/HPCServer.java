@@ -468,6 +468,7 @@ public class HPCServer implements Runnable {
 					output.add(msg);
 				}
 				if(msg.getPayload().getPrefix().contains(messageTAG )){
+System.out.println("hcpServer, run> nachricht ist eine message");
 					verteiler.addMessage(msg);
 				}
 				//Wenn der server empfänger ist UND es ein controltag ist (Server hat keine message nachrichten)...
@@ -513,6 +514,7 @@ public class HPCServer implements Runnable {
 					
 					
 				}else{
+System.out.println("hcpServer, run> nachricht ist eine message");
 					verteiler.addMessage(msg);
 				}
 				

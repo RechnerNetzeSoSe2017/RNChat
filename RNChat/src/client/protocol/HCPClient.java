@@ -192,6 +192,7 @@ public class HCPClient extends Thread {
 							clientString = in.readLine();
 							
 							if(clientString!=null){
+//System.out.println("ist schon in der schleife..");
 								log(clientString);
 								Message msg = messageBuilder.getFromString(clientString);
 								
@@ -199,9 +200,10 @@ public class HCPClient extends Thread {
 								if(msg!=null){
 									
 									List<Payload> plist = msg.getPayload().getPayloadList();
+//System.out.println("die payload ist: "+msg.getPayload());
 									Payload control=plist.get(0);
 									
-System.out.println("msg != null payload ist: "+control.toString());
+//System.out.println("msg != null payload ist: "+control.toString());
 									
 									//es ist ein <control> TAG
 									if(msg.getPayload().getPrefix().equals(controlTag)){
@@ -212,19 +214,35 @@ System.out.println("msg != null payload ist: "+control.toString());
 
 											plist=control.getPayloadList();
 											Payload add=plist.get(0);
-System.out.println("sollte <control><channel>.. sein.  ..  lautet: "+add.toString());											
+//System.out.println("sollte <control><channel>.. sein.  ..  lautet: "+add.toString());											
 											//wenn ..<channel>   <add>[name]</add>   </channel>...
 											if(add.getPrefix().contains(channelAddTAG)){
 												plist=add.getPayloadList();
 												Payload name = plist.get(0);
-System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
+//System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
 												uiController.addToChannellist(name.toString());
 											}
 											
 											
+										}else if(control.getPrefix().equals(nickAddTAG)){
+											//<to>[raumname]</to>   <nickadd> [name] </nickadd>
+											plist=control.getPayloadList();
+											Payload nickStatus=plist.get(0);
+System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "+nickStatus);
+											
 										}
 										
 										
+										
+									}else if(msg.getPayload().getPrefix().equals(messageTag)){
+//										dies ist eine Nachricht die an das entsprechende fenster geschickt werden muss..
+//System.out.println("hcp, run> ");
+										
+										String vonUser = msg.getFrom().toString();
+										String vonRaum = msg.getTo().toString();
+										String nachricht = msg.getPayload().getPayloadList().get(0).toString();
+										
+										uiController.messageToChat(vonRaum,vonUser,nachricht);
 										
 									}
 									
@@ -348,8 +366,8 @@ System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
 
 	public void sendMessage(String message, String receiverID) {
 		
-		Message msg = messageBuilder.newMessage(nickname, "Server", message);
-		
+		Message msg = messageBuilder.newMessage(nickname, receiverID, message);
+System.out.println("hcp, sendMessage>"+msg);		
 //		outputQueue.add(msg.toString());
 		outputQueue.add(message);
 	}
@@ -372,6 +390,19 @@ System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
 	 */
 	public void closeConnection() {
 		if (outputThread != null) {
+			
+			Message logout = messageBuilder.getLogout(nickname, "Server");
+			outputQueue.add(logout.toString());
+			
+			//1 sekunde warten, damit auch die wahrscheinlichkeit größer ist das die restlichen nachrichten noch gesendet werden..
+			//very bad!..
+			try {
+				Thread.currentThread().sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			outputThread.stopSend();
 		}
 		//hier die liste .notify?
@@ -431,7 +462,7 @@ System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
 	public void subscribe(String name) {
 
 		Message msg = messageBuilder.getSubscribe(nickname, "Server", name);
-
+System.out.println("hcp client, subscribe>"+msg);
 		outputQueue.add(msg.toString());
 
 	}
@@ -444,6 +475,13 @@ System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
 	public void unsubscribe(String name) {
 		Message msg = messageBuilder.getUnsubscribe(nickname, "Server", name);
 		outputQueue.add(msg.toString());
+	}
+	/**
+	 * Liefert den Nicknamen
+	 * @return
+	 */
+	public String getNick(){
+		return nickname;
 	}
 	
 	

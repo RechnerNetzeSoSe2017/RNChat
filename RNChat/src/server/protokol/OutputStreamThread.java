@@ -47,10 +47,14 @@ public class OutputStreamThread<E> extends Thread {
 		}
 		
 	}
-	
+	/**
+	 * Sorgt dafür das dieser Thread aufhört zu senden und er ordnungsgemäß "herunter fährt"
+	 */
 	public void stopSend(){
 		shutdown=true;
 //		output.notifyAll();
 		interrupt();
 	}
+	
+
 }

@@ -100,7 +100,7 @@ public class MessageBuilder<FromType, ToType> {
 			if (arbeitsString.contains(messageTAG)) {
 //				int begin = string.indexOf(">") + 1;
 //				int ende = string.lastIndexOf("<");
-
+System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeitsString);
 				
 					// String nachricht = string.substring(begin, ende);
 					String nachricht = getInBetweenTAGs(messageTAG, messageTAGClose, string);
@@ -322,6 +322,14 @@ public class MessageBuilder<FromType, ToType> {
 		
 		
 	}
+	public Message getLogout(String from, String to){
+		
+		Payload logout = new Payload<>(logoutTAG, "", logoutTAGClose);
+		Payload control = new Payload<>(controlTAG, logout, controlTAGClose);
+		
+		return new Message<String, String>(from, to, control);
+		
+	}
 	
 	private Payload getControlBody(String restString) {
 		// <control>[hier ist restString]</control>
@@ -399,6 +407,22 @@ public class MessageBuilder<FromType, ToType> {
 					}
 
 				}
+			 else if(workString.contains(channelTAG)){
+				 //<channel>.....</channel>
+				 //kann <add>..</add> beinhalten
+				 
+				 String temp = getInBetweenTAGs(channelTAG, channelCloseTAG, restString);
+				 //temp ist nun <add>[]</add>
+				 
+				 if(temp != null && temp.contains(addTAG)){
+					 
+					 String name = getInBetweenTAGs(addTAG, addTAGClose, restString);
+					 
+					 return new Payload<Payload>(channelTAG,new Payload<Payload>(addTAG,new Payload<String>("",name,""),addTAGClose),channelCloseTAG);
+					 
+				 }
+				 
+			 }
 
 		}
 		return null;
