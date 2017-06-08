@@ -201,13 +201,13 @@ public class HCPClient extends Thread {
 									
 									List<Payload> plist = msg.getPayload().getPayloadList();
 //System.out.println("die payload ist: "+msg.getPayload());
-									Payload control=plist.get(0);
+									
 									
 //System.out.println("msg != null payload ist: "+control.toString());
 									
 									//es ist ein <control> TAG
 									if(msg.getPayload().getPrefix().equals(controlTag)){
-									
+										Payload control=plist.get(0);
 										
 										//wenn <control><channel>..</channel></control>
 										if(control.getPrefix().contains(channellistTAG)){
@@ -369,7 +369,7 @@ System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "+nickS
 		Message msg = messageBuilder.newMessage(nickname, receiverID, message);
 System.out.println("hcp, sendMessage>"+msg);		
 //		outputQueue.add(msg.toString());
-		outputQueue.add(message);
+		outputQueue.add(msg.toString());
 	}
 
 	/**

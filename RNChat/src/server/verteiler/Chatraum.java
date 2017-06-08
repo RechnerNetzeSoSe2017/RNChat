@@ -183,9 +183,17 @@ public class Chatraum extends Thread {
 //	public String getIDName(){
 //		return name;
 //	}
+	/**
+	 * Liefert den Namen des Chatraums
+	 * @return
+	 */
 	public String getRoomName(){
 		return name;
 	}
+	/**
+	 * Fügt eine Nachricht zum verteiler des raumes hinzu
+	 * @param msg
+	 */
 	public void addMessage(Message msg){
 		nachrichten.add(msg);
 	}
@@ -194,6 +202,23 @@ public class Chatraum extends Thread {
 		arbeiten=false;
 		interrupt();
 		
+	}
+
+	/**
+	 * Liefert eine Liste mit allen Usernamen die Momentan im Raum sind
+	 * @return null wenn keiner im Raum ist
+	 */
+	public ArrayList<String> getNicklist() {
+
+		ArrayList<String> list = new ArrayList<>();
+		
+		for(HPCServer elem : clientList){
+			list.add(elem.getClientName());
+		}
+		if(list.isEmpty()){
+			return null;
+		}
+		return list;
 	}
 	
 

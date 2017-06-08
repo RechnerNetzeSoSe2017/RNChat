@@ -2,6 +2,7 @@ package server.verteiler;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -155,6 +156,36 @@ System.out.println("verteiler,run> nachricht wird verteilt: "+msg);
 		for(Chatraum raum: raumListe){
 			raum.start();
 		}
+		
+	}
+
+	/**
+	 * Liefert eine Liste mit Usernamen eines Raumes.
+	 * @param raumname
+	 */
+	public List<String> getNicklist(String raumname) {
+		// TODO Auto-generated method stub
+		
+		ArrayList<String> liste = new ArrayList();
+		if(raumname!= null){
+			for(Chatraum elem : raumListe){
+				
+				if(elem.getRoomName().equals(raumname)){
+					
+					liste=elem.getNicklist();
+					break;
+				}
+				
+				
+			}
+			if(liste.isEmpty()){
+				return null;
+			}
+			
+		}else{
+			return null;
+		}
+		return liste;
 		
 	}
 	

@@ -43,6 +43,8 @@ public class MessageBuilder<FromType, ToType> {
 	private String nameserviceTAGClose = "</nameservice>";
 	private String nickTAG = "<nick>";
 	private String nickTAGClose = "</nick>";
+	private String nickListTAG="<nicklist>";
+	private String nickListCloseTAG="</nicklist>";
 	private String channellistTAG = "<channellist>";
 	private String channellistTAGClose = "</channellist>";
 	private String logoutTAG = "<logout>";
@@ -280,6 +282,19 @@ System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeits
 		return msg;
 	}
 	/**
+	 * Erzeugt eine Nachricht nach dem Message-Format:
+	 * {@code <from>..</from><to>..</to><control><nicklist></control>}
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public Message getNickList(FromType from, ToType to){
+		Payload<String> nicklist = new Payload<>(nickListTAG, "", nickListCloseTAG);
+		Payload<Payload> control = new Payload<>(controlTAG, nicklist, controlTAGClose);
+		
+		return new Message<FromType, ToType>(from, to, control);
+	}
+	/**
 	 * Erstellt eine subscribe-Message
 	 * @param from
 	 * @param to
@@ -312,6 +327,13 @@ System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeits
 		
 		return msg;
 	}
+	/**
+	 * Erzeugt eine Nachricht nach dem Message-Format:
+	 * {@code <from>..</from><to>..</to><control><channellist></channellist></control>}
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public Message getchannellist(FromType from, ToType to){
 		
 		Payload channellist = new Payload<>(channellistTAG, "", channellistTAGClose);
@@ -323,6 +345,14 @@ System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeits
 		
 		
 	}
+
+	/**
+	 * Erzeugt eine Nachricht nach dem Message-Format:
+	 * {@code <from>..</from><to>..</to><control><logout></control>}
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public Message getLogout(String from, String to){
 		
 		Payload logout = new Payload<>(logoutTAG, "", logoutTAGClose);
@@ -408,6 +438,9 @@ System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeits
 					}
 
 				}
+			 else if(workString.contains(nickListTAG)){
+				 return new Payload<String>(nickListTAG,"",nickListCloseTAG);
+			 }
 			 else if(workString.contains(channelTAG)){
 				 //<channel>.....</channel>
 				 //kann <add>..</add> beinhalten

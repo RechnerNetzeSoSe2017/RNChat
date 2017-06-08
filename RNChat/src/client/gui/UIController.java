@@ -1,6 +1,8 @@
 package client.gui;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import client.protocol.HCPClient;
@@ -213,6 +215,7 @@ public class UIController implements Initializable{
 				raum1LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum1LV.getItems());
 				raum1Name=name;
+				raum1Besetzt=true;
 			}else if(!raum2Besetzt){
 				raum2TA.clear();
 				hcpClient.setTextareaForRoom(name, raum2TA);
@@ -220,6 +223,7 @@ public class UIController implements Initializable{
 				raum2LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum2LV.getItems());
 				raum2Name=name;
+				raum2Besetzt=true;
 			}
 			
 			if(raum1Besetzt && raum2Besetzt){
@@ -255,14 +259,16 @@ public class UIController implements Initializable{
 	 * @param nachricht
 	 */
 	public void messageToChat(String tabname, String absender, String nachricht){
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		String uhrzeit = sdf.format(new Date());
 		
 		
 		if(tabname.equals(raum1Name)){
-			raum1TA.appendText(nachricht);
+			raum1TA.appendText(uhrzeit+" - "+absender+">"+nachricht+"\n");
+			
 		}
 		else if(tabname.equals(raum2Name)){
-			raum2TA.appendText(nachricht);
+			raum2TA.appendText(uhrzeit+" - "+absender+">"+nachricht+"\n");
 		}
 		
 		

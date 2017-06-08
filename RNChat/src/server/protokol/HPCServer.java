@@ -74,6 +74,7 @@ public class HPCServer implements Runnable {
 	private boolean closeConnection = false;
 
 	private String channellistTAG ="<channellist>";
+	private String nicklistTAG="<nicklist>";
 	private String subscribeTAG ="<subscribe>";
 	private String unsubscribeTAG="<unsubscribe>";
 	private String logoutTAG ="<logout>";
@@ -503,6 +504,23 @@ System.out.println("hcpServer, run> nachricht ist eine message");
 						output.add(mess);
 						
 					}
+					//alle nicks eines raumes auflisten
+					else if(control.getPrefix().contains(nicklistTAG)){
+						
+						String raumname=msg.getTo();
+						List<String> usernames = verteiler.getNicklist(raumname);
+						
+						
+						if(!usernames.isEmpty()){
+							for(String elem : usernames){
+								
+								Message nickadd = messageBuilder.getNickadd(raumname, raumname, elem);
+								output.add(nickadd);
+								
+							}
+						}
+						
+					}
 					
 				
 					
@@ -683,6 +701,10 @@ System.out.println("hcpServer, run> nachricht ist eine message");
 	public int getID() {
 		return clientID;
 	}
+	/**
+	 * Liefert den Nicknamen des Clients
+	 * @return
+	 */
 	public String getClientName(){
 		return clientName;
 	}
