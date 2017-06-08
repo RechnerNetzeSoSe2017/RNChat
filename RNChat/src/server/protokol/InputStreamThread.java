@@ -72,7 +72,7 @@ public class InputStreamThread extends Thread {
 
 			
 			if (clientNachricht != null) {
-				
+System.out.println("inputThread, run> bevor der string geparst wird:"+clientNachricht);				
 				Message<String, String> message = payloadBuilder.getFromString(clientNachricht);
 				
 
@@ -86,7 +86,7 @@ System.out.println("inputstreamthread, run> die geparste nachricht: "+message.to
 			try {
 				
 				clientNachricht = in.readLine();
-
+System.out.println("inputStreamThread, run> eingabe des clients:");
 			} catch (IOException e) {
 				// wenn aus irgendeinem grund der Stream nicht gelesen werden
 				// kann..
