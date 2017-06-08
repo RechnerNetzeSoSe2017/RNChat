@@ -130,6 +130,16 @@ public class Chatraum extends Thread {
 	 */
 	public boolean subscibe(HPCServer client){
 		if(client!=null){
+			
+			Message msg = messageBuilder.getNickadd(name, name, client.getClientName());
+System.out.println("chatraum, subscribe> die nachricht die hinzugefuegt wird: "+msg);
+
+
+			for(HPCServer clients : clientList){
+				clients.sendMessage(msg);
+			}
+//			nachrichten.add(msg);
+			
 			clientList.add(client);
 			
 			// TODO gescheites willkommensnachrichtensystem entwickeln
@@ -138,9 +148,9 @@ public class Chatraum extends Thread {
 			
 		}
 		
-		Message msg = messageBuilder.getNickadd(name, name, client.getClientName());
 		
-		nachrichten.add(msg);
+		
+		
 		
 		return true;
 	}

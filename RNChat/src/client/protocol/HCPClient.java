@@ -31,6 +31,7 @@ public class HCPClient extends Thread {
 
 	private UIController uiController;
 	private LinkedBlockingQueue<String> outputQueue = new LinkedBlockingQueue<>();
+	private Locale locale = Locale.GERMAN;
 
 	// ----------------------------------------------------------------------
 	private BufferedReader in;
@@ -51,17 +52,17 @@ public class HCPClient extends Thread {
 
 	// <MESSAGE>-Format
 	// steht in den Methoden
-	private String controlTag="<control>";
-	private String messageTag="<message>";
+	private String controlTag = "<control>";
+	private String messageTag = "<message>";
 	private String channellistTAG = "<channel>";
-	private String channelAddTAG="<add>";
-	private String subscribeTAG="<subscribe>";
-	private String okTAG="<ok>";
-	private String nokTAG="<nok>";
-	private String unsubscribeTAG="<unsubscribe>";
-	private String nickAddTAG="<nickadd>";
-	private String nickLeaveTAG="<nickleave>";
-	
+	private String channelAddTAG = "<add>";
+	private String subscribeTAG = "<subscribe>";
+	private String okTAG = "<ok>";
+	private String nokTAG = "<nok>";
+	private String unsubscribeTAG = "<unsubscribe>";
+	private String nickAddTAG = "<nickadd>";
+	private String nickRemTAG = "<nickleave>";
+	private String nickLeaveTAG = "<nickleave>";
 
 	// -----------------------------------------------------
 
@@ -77,7 +78,7 @@ public class HCPClient extends Thread {
 	private ObservableList raumliste;
 
 	private HashMap<String, TextArea> chatraumFenster = new HashMap<>();
-	private HashMap<String,ObservableList> nicknameFenster = new HashMap<>(); 
+	private HashMap<String, ObservableList> nicknameFenster = new HashMap<>();
 
 	private MessageBuilder<String, String> messageBuilder = new MessageBuilder<String, String>();
 
@@ -157,25 +158,23 @@ public class HCPClient extends Thread {
 					communicate = false;
 					log("nickname war nicht OK");
 					out.println("<bye>");
-				}else{
+				} else {
 					log("<eoh>");
 					out.println("<eoh>");
 				}
-				
-				
 
 				if (communicate) {
 
 					try {
-						//server sagt Start message-format now!
-						antwort=in.readLine();
+						// server sagt Start message-format now!
+						antwort = in.readLine();
 						log(antwort);
-						
+
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
+
 					// ab hier ist wieder provisorisch...
 					outputThread = new OutputStreamThread(out, outputQueue);
 					outputThread.start();
@@ -185,76 +184,110 @@ public class HCPClient extends Thread {
 					outputQueue.add(messageBuilder.getchannellist(nickname, "Server").toString());
 					while (!socket.isClosed() && communicate) {
 						String clientString = null;
-						
-						
+
 						try {
-							
+
 							clientString = in.readLine();
-							
-							if(clientString!=null){
-//System.out.println("ist schon in der schleife..");
+
+							if (clientString != null) {
+								// System.out.println("ist schon in der
+								// schleife..");
 								log(clientString);
 								Message msg = messageBuilder.getFromString(clientString);
-								
-								//ab hier werden die Nachrichten verarbeitet
-								if(msg!=null){
-									
-									List<Payload> plist = msg.getPayload().getPayloadList();
-//System.out.println("die payload ist: "+msg.getPayload());
-									
-									
-//System.out.println("msg != null payload ist: "+control.toString());
-									
-									//es ist ein <control> TAG
-									if(msg.getPayload().getPrefix().equals(controlTag)){
-										Payload control=plist.get(0);
-										
-										//wenn <control><channel>..</channel></control>
-										if(control.getPrefix().contains(channellistTAG)){
 
-											plist=control.getPayloadList();
-											Payload add=plist.get(0);
-//System.out.println("sollte <control><channel>.. sein.  ..  lautet: "+add.toString());											
-											//wenn ..<channel>   <add>[name]</add>   </channel>...
-											if(add.getPrefix().contains(channelAddTAG)){
-												plist=add.getPayloadList();
+								// ab hier werden die Nachrichten verarbeitet
+								if (msg != null) {
+
+									List<Payload> plist = msg.getPayload().getPayloadList();
+									// System.out.println("die payload ist:
+									// "+msg.getPayload());
+
+									// System.out.println("msg != null payload
+									// ist: "+control.toString());
+
+									// es ist ein <control> TAG
+									if (msg.getPayload().getPrefix().equals(controlTag)) {
+										Payload control = plist.get(0);
+
+										// wenn
+										// <control><channel>..</channel></control>
+										if (control.getPrefix().contains(channellistTAG)) {
+
+											plist = control.getPayloadList();
+											Payload add = plist.get(0);
+											// System.out.println("sollte
+											// <control><channel>.. sein. ..
+											// lautet: "+add.toString());
+											// wenn ..<channel>
+											// <add>[name]</add> </channel>...
+											if (add.getPrefix().contains(channelAddTAG)) {
+												plist = add.getPayloadList();
 												Payload name = plist.get(0);
-//System.out.println("der name der hinzugefuegt werden soll: "+name.toString());
+												// System.out.println("der name
+												// der hinzugefuegt werden soll:
+												// "+name.toString());
 												uiController.addToChannellist(name.toString());
 											}
-											
-											
-										}else if(control.getPrefix().equals(nickAddTAG)){
-											//<to>[raumname]</to>   <nickadd> [name] </nickadd>
-											plist=control.getPayloadList();
-											Payload nickStatus=plist.get(0);
-System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "+nickStatus);
-											
+
+										} else if (control.getPrefix().equals(nickAddTAG)) {
+											// <to>[raumname]</to> <nickadd>
+											// [name] </nickadd>
+											plist = control.getPayloadList();
+//System.out.println("hcp,run> liste: " + control.getPayloadList().toString());
+//System.out.println("hcp,run> liste: " + control.getPayloadList().get(0).toString());
+
+											// String
+											// nickStatus=plist.get(0).toString();
+											String nickName = control.getPayloadList().get(0).toString();
+
+System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "	+ nickName + " <---- yaaayy");
+											uiController.addNickToNicklist(msg.getTo().toString(), nickName);
+
+										} else if (control.getPrefix().equals(nickLeaveTAG)) {
+											// <to>[raumname]</to> <nickadd>
+											// [name] </nickadd>
+											plist = control.getPayloadList();
+											// System.out.println("hcp,run>
+											// liste:
+											// "+control.getPayloadList().toString());
+											// System.out.println("hcp,run>
+											// liste:
+											// "+control.getPayloadList().get(0).toString());
+
+											// String
+											// nickStatus=plist.get(0).toString();
+											String nickName = control.getPayloadList().get(0).toString();
+
+											// System.out.println("hcp,run> name
+											// des nicks der hinzugefügt werden
+											// soll: "+nickName+" <----
+											// yaaayy");
+											// uiController.addNickToNicklist(msg.getTo().toString(),
+											// nickName);
+											uiController.removeNickfromNicklist(msg.getTo().toString(), nickName);
+
+										} else if (msg.getPayload().getPrefix().equals(messageTag)) {
+											// dies ist eine Nachricht die an
+											// das entsprechende fenster
+											// geschickt werden muss..
+											// System.out.println("hcp, run> ");
+
+											String vonUser = msg.getFrom().toString();
+											String vonRaum = msg.getTo().toString();
+											String nachricht = msg.getPayload().getPayloadList().get(0).toString();
+
+											uiController.messageToChat(vonRaum, vonUser, nachricht);
+
 										}
-										
-										
-										
-									}else if(msg.getPayload().getPrefix().equals(messageTag)){
-//										dies ist eine Nachricht die an das entsprechende fenster geschickt werden muss..
-//System.out.println("hcp, run> ");
-										
-										String vonUser = msg.getFrom().toString();
-										String vonRaum = msg.getTo().toString();
-										String nachricht = msg.getPayload().getPayloadList().get(0).toString();
-										
-										uiController.messageToChat(vonRaum,vonUser,nachricht);
-										
+
 									}
-									
-									
+
 								}
-								
 							}
-							
-							
+
 						} catch (SocketException se) {
-//							communicate = false;
-							clientString=null;
+							// communicate = false;
+							clientString = null;
 						}
 
 						catch (IOException e) {
@@ -270,6 +303,20 @@ System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "+nickS
 
 		}
 
+	}
+
+	private String getInBetweenTAGs(String tagBegin, String tagEnd, String getFrom) {
+		if (getFrom != null) {
+			String temp = getFrom.toLowerCase(locale);
+
+			int startidex = temp.indexOf(tagBegin) + tagBegin.length();
+			int startindexClose = temp.indexOf(tagEnd);
+
+			if (startidex < startindexClose) {
+				return getFrom.substring(startidex, startindexClose);
+			}
+		}
+		return null;
 	}
 
 	// private String
@@ -365,10 +412,10 @@ System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "+nickS
 	}
 
 	public void sendMessage(String message, String receiverID) {
-		
+
 		Message msg = messageBuilder.newMessage(nickname, receiverID, message);
-System.out.println("hcp, sendMessage>"+msg);		
-//		outputQueue.add(msg.toString());
+		System.out.println("hcp, sendMessage>" + msg);
+		// outputQueue.add(msg.toString());
 		outputQueue.add(msg.toString());
 	}
 
@@ -390,22 +437,23 @@ System.out.println("hcp, sendMessage>"+msg);
 	 */
 	public void closeConnection() {
 		if (outputThread != null) {
-			
+
 			Message logout = messageBuilder.getLogout(nickname, "Server");
 			outputQueue.add(logout.toString());
-			
-			//1 sekunde warten, damit auch die wahrscheinlichkeit größer ist das die restlichen nachrichten noch gesendet werden..
-			//very bad!..
+
+			// 1 sekunde warten, damit auch die wahrscheinlichkeit größer ist
+			// das die restlichen nachrichten noch gesendet werden..
+			// very bad!..
 			try {
 				Thread.currentThread().sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			outputThread.stopSend();
 		}
-		//hier die liste .notify?
+		// hier die liste .notify?
 
 	}
 
@@ -440,19 +488,20 @@ System.out.println("hcp, sendMessage>"+msg);
 	public void setTextareaForRoom(String raumname, TextArea area) {
 		chatraumFenster.put(raumname, area);
 	}
+
 	/**
 	 * setzt die nicklisten damit die befüllt werden können
+	 * 
 	 * @param raumname
 	 * @param listview
 	 */
-	public void setListViewForNicklist(String raumname,ObservableList listview){
+	public void setListViewForNicklist(String raumname, ObservableList listview) {
 		nicknameFenster.put(raumname, listview);
 	}
 
 	public void removeTextArea(String name) {
 		chatraumFenster.remove(name);
 	}
-	
 
 	/**
 	 * Teilt dem Server mit das ein bestimmter Raum subscribed werden soll
@@ -461,9 +510,14 @@ System.out.println("hcp, sendMessage>"+msg);
 	 */
 	public void subscribe(String name) {
 
+		// zuerst den raum abbonieren und dann eine liste von nciks holen
 		Message msg = messageBuilder.getSubscribe(nickname, "Server", name);
-System.out.println("hcp client, subscribe>"+msg);
+		System.out.println("hcp client, subscribe>" + msg);
 		outputQueue.add(msg.toString());
+
+		System.out.println("hcp client, subscribe> hole nickliste");
+		Message msg2 = messageBuilder.getNickList(nickname, name);
+		outputQueue.add(msg2.toString());
 
 	}
 
@@ -476,14 +530,14 @@ System.out.println("hcp client, subscribe>"+msg);
 		Message msg = messageBuilder.getUnsubscribe(nickname, "Server", name);
 		outputQueue.add(msg.toString());
 	}
+
 	/**
 	 * Liefert den Nicknamen
+	 * 
 	 * @return
 	 */
-	public String getNick(){
+	public String getNick() {
 		return nickname;
 	}
-	
-	
 
 }

@@ -212,7 +212,7 @@ public class UIController implements Initializable{
 				raum1TA.clear();
 				hcpClient.setTextareaForRoom(name, raum1TA);
 				raum1LV.getItems().clear();
-				raum1LV.getItems().add(hcpClient.getNick());
+//				raum1LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum1LV.getItems());
 				raum1Name=name;
 				raum1Besetzt=true;
@@ -220,7 +220,7 @@ public class UIController implements Initializable{
 				raum2TA.clear();
 				hcpClient.setTextareaForRoom(name, raum2TA);
 				raum2LV.getItems().clear();
-				raum2LV.getItems().add(hcpClient.getNick());
+//				raum2LV.getItems().add(hcpClient.getNick());
 				hcpClient.setListViewForNicklist(name, raum2LV.getItems());
 				raum2Name=name;
 				raum2Besetzt=true;
@@ -298,6 +298,52 @@ public class UIController implements Initializable{
 			disconnectB.setDisable(false);
 			connectB.setDisable(true);
 		}
+		
+	}
+	/**
+	 * Fügt der nick-übersicht einen namen hinzu
+	 * @param raumname
+	 * @param nickname
+	 */
+	public void addNickToNicklist(String raumname, String nickname){
+		
+		if(raumname != null && nickname != null){
+			
+			if(raumname.equals(raum1Name)){
+				
+				raum1LV.getItems().add(nickname);
+				
+				
+			}else if(raumname.equals(raum2Name)){
+				
+				raum2LV.getItems().add(nickname);
+			}
+			
+		}
+		
+		
+	}
+	/**
+	 * entfernt einen Nickname aus der Nickübersicht eines Raumes
+	 * @param raumname
+	 * @param nickname
+	 */
+	public void removeNickfromNicklist(String raumname, String nickname){
+		
+		if(raumname != null && nickname != null){
+			
+			if(raumname.equals(raum1Name)){
+				
+				raum1LV.getItems().remove(nickname);
+				
+				
+			}else if(raumname.equals(raum2Name)){
+				
+				raum2LV.getItems().remove(nickname);
+			}
+			
+		}
+		
 		
 	}
 	private void disconnect(){

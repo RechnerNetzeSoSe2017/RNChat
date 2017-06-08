@@ -83,7 +83,7 @@ public class MessageBuilder<FromType, ToType> {
 			
 			
 //			int start =arbeitsString.indexOf(toTAGClose)+toTAGClose.length();
-System.out.println("messagebuilder, getfromstring> bevor der string uebergeben wird: "+string);			
+//System.out.println("messagebuilder, getfromstring> bevor der string uebergeben wird: "+string);			
 			Payload payload = getPayloadFromString(string);
 
 			if (payload != null && from != null && to != null) {
@@ -98,12 +98,12 @@ System.out.println("messagebuilder, getfromstring> bevor der string uebergeben w
 		if (string != null) {
 
 			String arbeitsString = string.toLowerCase(locale).trim();
-System.out.println("messagebuilder, getpayloadfromString> string original: "+string);
-System.out.println("messagebuilder, getpayloadfromString> string wird geparst: "+arbeitsString);
+//System.out.println("messagebuilder, getpayloadfromString> string original: "+string);
+//System.out.println("messagebuilder, getpayloadfromString> string wird geparst: "+arbeitsString);
 			if (arbeitsString.contains(messageTAG)) {
 //				int begin = string.indexOf(">") + 1;
 //				int ende = string.lastIndexOf("<");
-System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeitsString);
+//System.out.println("messagebuilder, getpayloadfromString> ist message: "+arbeitsString);
 				
 					// String nachricht = string.substring(begin, ende);
 					String nachricht = getInBetweenTAGs(messageTAG, messageTAGClose, string);
