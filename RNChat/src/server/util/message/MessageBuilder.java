@@ -96,6 +96,7 @@ public class MessageBuilder<FromType, ToType> {
 		if (string != null) {
 
 			String arbeitsString = string.toLowerCase(locale).trim();
+System.out.println("messagebuilder, getpayloadfromString> string original: "+string);
 System.out.println("messagebuilder, getpayloadfromString> string wird geparst: "+arbeitsString);
 			if (arbeitsString.contains(messageTAG)) {
 //				int begin = string.indexOf(">") + 1;
