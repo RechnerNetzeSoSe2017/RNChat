@@ -220,6 +220,7 @@ public class HPCServer implements Runnable {
 
 		// die ID muss wieder frei gemacht werden..
 		IDGenerator.freeID(clientID);
+		nslookup.removeName(clientName);
 
 		if (outputThread != null) {
 			// wenn modus vollduplex, dann die threads beenden
