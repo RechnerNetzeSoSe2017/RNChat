@@ -81,7 +81,7 @@ public class MessageBuilder<FromType, ToType> {
 			
 			
 //			int start =arbeitsString.indexOf(toTAGClose)+toTAGClose.length();
-			
+System.out.println("messagebuilder, getfromstring> bevor der string uebergeben wird: "+string);			
 			Payload payload = getPayloadFromString(string);
 
 			if (payload != null && from != null && to != null) {
