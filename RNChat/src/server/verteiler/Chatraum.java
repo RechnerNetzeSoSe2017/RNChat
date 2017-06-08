@@ -69,7 +69,7 @@ public class Chatraum extends Thread {
 				
 				
 				if(pl.getPrefix().equals(messageTAG)){
-					
+System.out.println("chatraum, run> nachricht wird versand: "+msg );					
 					sendToClient(null, msg);					
 					
 				}else if(pl.getPrefix().equals(subscribeTAG)){
@@ -167,6 +167,8 @@ System.out.println("chatraum, subscribe> die nachricht die hinzugefuegt wird: "+
 			}
 			
 			
+			
+			
 		}
 		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -174,6 +176,14 @@ System.out.println("chatraum, subscribe> die nachricht die hinzugefuegt wird: "+
 		}finally{
 			semaphore.release();
 		}
+		Message msg = messageBuilder.getNickLeave(name, name, client.getClientName());
+		
+		System.out.println("chatraum, subscribe> die nachricht die hinzugefuegt wird: "+msg);
+
+
+					for(HPCServer clients : clientList){
+						clients.sendMessage(msg);
+					}
 		
 		
 	}

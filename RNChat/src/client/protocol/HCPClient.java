@@ -240,7 +240,7 @@ public class HCPClient extends Thread {
 											// nickStatus=plist.get(0).toString();
 											String nickName = control.getPayloadList().get(0).toString();
 
-System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "	+ nickName + " <---- yaaayy");
+//System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "	+ nickName + " <---- yaaayy");
 											uiController.addNickToNicklist(msg.getTo().toString(), nickName);
 
 										} else if (control.getPrefix().equals(nickLeaveTAG)) {
@@ -258,30 +258,26 @@ System.out.println("hcp,run> name des nicks der hinzugefügt werden soll: "	+ nic
 											// nickStatus=plist.get(0).toString();
 											String nickName = control.getPayloadList().get(0).toString();
 
-											// System.out.println("hcp,run> name
-											// des nicks der hinzugefügt werden
-											// soll: "+nickName+" <----
-											// yaaayy");
+System.out.println("hcp,run> name des nicks der entfernt werden soll: "+nickName+" <----yaaayy");
 											// uiController.addNickToNicklist(msg.getTo().toString(),
 											// nickName);
 											uiController.removeNickfromNicklist(msg.getTo().toString(), nickName);
 
-										} else if (msg.getPayload().getPrefix().equals(messageTag)) {
-											// dies ist eine Nachricht die an
-											// das entsprechende fenster
-											// geschickt werden muss..
-											// System.out.println("hcp, run> ");
+										} 
 
-											String vonUser = msg.getFrom().toString();
-											String vonRaum = msg.getTo().toString();
-											String nachricht = msg.getPayload().getPayloadList().get(0).toString();
+									}else if (msg.getPayload().getPrefix().equals(messageTag)) {
+										// dies ist eine Nachricht die an
+										// das entsprechende fenster
+										// geschickt werden muss..
+										// System.out.println("hcp, run> ");
+System.out.println("hcpclient, run> nachricht soll verteilt werden..");
+										String vonUser = msg.getFrom().toString();
+										String vonRaum = msg.getTo().toString();
+										String nachricht = msg.getPayload().getPayloadList().get(0).toString();
 
-											uiController.messageToChat(vonRaum, vonUser, nachricht);
-
-										}
+										uiController.messageToChat(vonRaum, vonUser, nachricht);
 
 									}
-
 								}
 							}
 
