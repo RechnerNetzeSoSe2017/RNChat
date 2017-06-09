@@ -33,6 +33,7 @@ public class InputStreamThread extends Thread {
 	private String tagControlClose = befehlsPraefix + "/control" + befehlsSuffix;
 
 	private MessageBuilder payloadBuilder = new MessageBuilder();
+	private HPCServer server = null;
 
 	/**
 	 * Erstellt einen neuen Thread, der auf dem InputStream liest und prüft ob
@@ -49,17 +50,25 @@ public class InputStreamThread extends Thread {
 		
 
 	}
+	public InputStreamThread(BufferedReader inStream, LinkedBlockingQueue queue,HPCServer hpcServer) {
+
+		in = inStream;
+		input = queue;
+		server=hpcServer;
+
+	}
 
 	@Override
 	public void run() {
 		// liest, checkt ob im <message>-format und legt die message in den
 		// puffer..
 
-		String clientNachricht = null;
+		String clientNachricht = "";
 
 		try {
 			clientNachricht = in.readLine();
 			System.out.println("Nachricht vom Client> "+clientNachricht);
+			
 
 		} catch (IOException e) {
 			// wenn aus irgendeinem grund der Stream nicht gelesen werden kann..
@@ -87,6 +96,17 @@ System.out.println("inputstreamthread, run> die geparste nachricht: "+message.to
 				
 				clientNachricht = in.readLine();
 System.out.println("---------------------\ninputStreamThread, run> eingabe des clients:"+clientNachricht);
+				
+				//in.readline liefert null wenn keine verbindung mehr besteht
+				if(clientNachricht==null){
+					listen=false;
+					
+					if(server!=null){
+						server.closeConnection();
+					}
+					
+					
+				}
 			} catch (IOException e) {
 				// wenn aus irgendeinem grund der Stream nicht gelesen werden
 				// kann..
@@ -254,6 +274,9 @@ System.out.println("---------------------\ninputStreamThread, run> eingabe des c
 		listen = false;
 
 		interrupt();
+	}
+	public boolean isStopped(){
+		return listen;
 	}
 
 }

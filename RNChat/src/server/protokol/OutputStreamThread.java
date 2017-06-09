@@ -55,6 +55,13 @@ public class OutputStreamThread<E> extends Thread {
 //		output.notifyAll();
 		interrupt();
 	}
+	/**
+	 * Sagt ob der Thread noch arbeitet oder nicht
+	 * @return
+	 */
+	public boolean isStopped(){
+		return shutdown;
+	}
 	
 
 }

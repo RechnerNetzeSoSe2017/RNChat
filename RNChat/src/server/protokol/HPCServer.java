@@ -254,6 +254,11 @@ public class HPCServer implements Runnable {
 		
 
 	}
+	private void checkConnected(){
+		if(inputThread.isStopped() || outputThread.isStopped()){
+			closeConnection();
+		}
+	}
 
 	private void readClientHeader() {
 		// liest den header des clients
@@ -439,7 +444,7 @@ public class HPCServer implements Runnable {
 		outputThread = new OutputStreamThread(out, output);
 		outputThread.start();
 
-		inputThread = new InputStreamThread(in, input);
+		inputThread = new InputStreamThread(in, input,this);
 		inputThread.start();
 
 		// testausgabe
