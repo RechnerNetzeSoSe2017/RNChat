@@ -142,13 +142,16 @@ public class OtherProtocol extends Thread {
 			
 			antwort=null;
 			
+			
+			//hier die Raumliste holen und dann channellist(String) mit jedem namen aufrufen
+			
 			while(!beenden){
 				//lesen bis der client beendet
 				
 				try {
 					antwort=in.readLine();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 					antwort=null;
 				}
@@ -199,6 +202,8 @@ public class OtherProtocol extends Thread {
 	 */
 	public void wechsleRaum(String raumname) {
 
+		outputQueue.add("JOIN:>"+raumname);
+		
 	}
 
 	/**

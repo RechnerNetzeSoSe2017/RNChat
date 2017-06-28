@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import chat.Server;
 import client.gui.UIController;
 import client.protocol.HCPClient;
 import javafx.event.ActionEvent;
@@ -97,7 +98,8 @@ public class MainGuiController implements Initializable{
 	public void initialize(URL location, ResourceBundle resources) {
 		instance=this;
 		
-		
+		Server ser = new Server();
+		ser.start();
 //		instance=this;
 		
 //		hcpClient=new HCPClient("127.0.0.1", 33333);
@@ -160,6 +162,17 @@ public class MainGuiController implements Initializable{
 			String nachricht = raum1TF.getText();
 			
 			raum1TF.setText("");
+			
+			if(nachricht.startsWith("/w")){
+				
+				String[] tmp = nachricht.split(" ");
+				
+				
+				if(tmp.length>=2){
+					client.wechsleRaum(tmp[1]);
+				}
+				
+			}
 			
 //			hcpClient.sendMessage(nachricht, raum1Name);
 			
