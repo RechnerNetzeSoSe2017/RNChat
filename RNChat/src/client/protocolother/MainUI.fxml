@@ -1,8 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1">
-	<!-- TODO Add Nodes -->
+<AnchorPane prefHeight="591.0" prefWidth="716.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.UIController">
+   <children>
+      <Pane layoutX="-2.0" prefHeight="591.0" prefWidth="716.0">
+         <children>
+            <TabPane fx:id="tabpane" layoutX="2.0" layoutY="28.0" prefHeight="563.0" prefWidth="716.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                  <Tab text="main">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Pane prefHeight="507.0" prefWidth="688.0">
+                                 <children>
+                                    <TextField fx:id="serverIPTF" layoutX="87.0" layoutY="14.0" />
+                                    <Label layoutX="14.0" layoutY="18.0" text="Server IP:" />
+                                    <Label layoutX="14.0" layoutY="55.0" text="Nickname:" />
+                                    <TextField fx:id="nicknameTF" layoutX="87.0" layoutY="51.0" />
+                                    <Separator layoutX="14.0" layoutY="128.0" prefHeight="1.0" prefWidth="235.0" />
+                                    <Button fx:id="connectB" layoutX="57.0" layoutY="92.0" mnemonicParsing="false" text="Connect" />
+                                    <Separator layoutX="249.0" orientation="VERTICAL" prefHeight="128.0" prefWidth="4.0" />
+                                    <ListView fx:id="raumlisteLV" layoutX="393.0" layoutY="55.0" prefHeight="357.0" prefWidth="200.0" />
+                                    <Label layoutX="393.0" layoutY="31.0" text="Raumliste" />
+                                    <Button fx:id="joinB" layoutX="414.0" layoutY="435.0" mnemonicParsing="false" text="betreten" />
+                                    <Button fx:id="disconnectB" layoutX="161.0" layoutY="92.0" mnemonicParsing="false" text="disconnect" />
+                                    <Button fx:id="leaveB" layoutX="541.0" layoutY="435.0" mnemonicParsing="false" text="verlassen" />
+                                 </children>
+                              </Pane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                <Tab text="serverlog">
+                     <content>
+                        <Pane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <ScrollPane prefHeight="350.0" prefWidth="561.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="346.0" prefWidth="558.0">
+                                       <children>
+                                          <TextArea fx:id="messageArea" prefHeight="343.0" prefWidth="553.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                              <Button fx:id="sendButton" layoutX="583.0" layoutY="392.0" mnemonicParsing="false" text="send" />
+                              <TextArea fx:id="inputArea" layoutX="14.0" layoutY="364.0" prefHeight="80.0" prefWidth="556.0" />
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+                  <Tab text="raum 1">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ScrollPane prefHeight="450.0" prefWidth="534.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="440.0" prefWidth="531.0">
+                                       <children>
+                                          <TextArea fx:id="raum1TA" prefHeight="439.0" prefWidth="530.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                              <ListView fx:id="raum1LV" layoutX="539.0" layoutY="7.0" prefHeight="438.0" prefWidth="163.0" />
+                              <TextField fx:id="raum1TF" layoutY="463.0" prefHeight="25.0" prefWidth="530.0" />
+                              <Button fx:id="raum1Senden" layoutX="567.0" layoutY="458.0" mnemonicParsing="false" prefHeight="61.0" prefWidth="108.0" text="Senden" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                <Tab text="raum2">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <ScrollPane prefHeight="453.0" prefWidth="535.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="449.0" prefWidth="531.0">
+                                       <children>
+                                          <TextArea fx:id="raum2TA" prefHeight="439.0" prefWidth="530.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                              <TextField fx:id="raum2TF" layoutY="473.0" prefHeight="25.0" prefWidth="531.0" />
+                              <ListView fx:id="raum2LV" layoutX="540.0" layoutY="7.0" prefHeight="439.0" prefWidth="176.0" />
+                              <Button fx:id="raum2Senden" layoutX="571.0" layoutY="459.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="114.0" text="Senden" />
+                           </children>
+                        </AnchorPane>
+                     </content></Tab>
+              </tabs>
+            </TabPane>
+            <MenuBar fx:id="menubar" layoutY="2.0" prefHeight="25.0" prefWidth="716.0">
+              <menus>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+         </children></Pane>
+   </children>
 </AnchorPane>
-
