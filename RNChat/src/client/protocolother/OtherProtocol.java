@@ -43,6 +43,8 @@ public class OtherProtocol extends Thread {
 	private HashMap<String, ObservableList> nicknameFenster = new HashMap<>();
 
 	private MainGuiController guiController = null;
+	
+	
 
 	public OtherProtocol(String host) {
 		this.host = host;
@@ -163,9 +165,25 @@ public class OtherProtocol extends Thread {
 		
 		
 	}
+	/**
+	 * parst die ankommende Nachricht
+	 * @param input
+	 */
 	private void parseNachricht(String input){
 		
+		guiController.messageToChat("", "", input);
+		
+		
 	}
+	/**
+	 * fügt einen namen zur kanalliste hinzu
+	 * @param name
+	 */
+	private void channellist(String name){
+		guiController.addToChannellist(name);
+	}
+	
+	
 	private void sendeChatnachricht(String chatnachricht){
 		
 		if(out!=null){

@@ -203,7 +203,11 @@ public class MainGuiController implements Initializable{
 	private void abboniereChannel() {
 		
 //		
-//		String name = raumlisteLV.getSelectionModel().getSelectedItem();
+		String name = raumlisteLV.getSelectionModel().getSelectedItem();
+		
+		
+		client.wechsleRaum(name);
+		raum1TA.clear();
 //		if(name!=null){
 //			hcpClient.subscribe(name);
 //			
@@ -262,16 +266,18 @@ public class MainGuiController implements Initializable{
 		String uhrzeit = sdf.format(new Date());
 		
 		
-		if(tabname.equals(raum1Name)){
+//		if(tabname.equals(raum1Name)){
 			raum1TA.appendText(uhrzeit+" - "+absender+">"+nachricht+"\n");
 			
-		}
-		else if(tabname.equals(raum2Name)){
-			raum2TA.appendText(uhrzeit+" - "+absender+">"+nachricht+"\n");
-		}
+//		}
+//		else if(tabname.equals(raum2Name)){
+//			raum2TA.appendText(uhrzeit+" - "+absender+">"+nachricht+"\n");
+//		}
 		
 		
 	}
+	
+	
 	
 	/**
 	 * Fügt einem Namen der Channelliste hinzu
