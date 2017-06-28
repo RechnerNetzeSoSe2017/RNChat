@@ -20,111 +20,199 @@ import javafx.scene.control.TextArea;
 import server.protokol.InputStreamThread;
 import server.protokol.OutputStreamThread;
 
-public class OtherProtocol extends Thread{
+public class OtherProtocol extends Thread {
 
-	private String host="127.0.0.1";
-	private int port=3333;
-	
-	private String nickname="";
-	
+	private String host = "127.0.0.1";
+	private int port = 33333;
+
+	private String nickname = "";
+
 	private Socket socket;
-	
+
 	private LinkedBlockingQueue<String> outputQueue = new LinkedBlockingQueue<>();
-	private BufferedReader in=null;
-	private PrintWriter out=null;
-	
+	private BufferedReader in = null;
+	private PrintWriter out = null;
+
 	private OutputStreamThread<String> outputThread;
 	private InputStreamThread inputThread;
 	private boolean communicate = true;
-	
+
 	private ObservableList raumliste;
 
 	private HashMap<String, TextArea> chatraumFenster = new HashMap<>();
 	private HashMap<String, ObservableList> nicknameFenster = new HashMap<>();
 
+	private MainGuiController guiController = null;
 
-	private MainGuiController guiController=null;
-	
 	public OtherProtocol(String host) {
-		this.host=host;
-		guiController=MainGuiController.getInstance();
-		
+		this.host = host;
+		guiController = MainGuiController.getInstance();
+
 	}
-	
+
 	@Override
 	public void run() {
 
-
-		socket=null;
+		socket = null;
 		
+		boolean communikation=false;
+
 		try {
-//			socket= new Socket(Inet4Address.getByName(host), port);
-			socket=SSLSocketFactory.getDefault().createSocket(host, 3333);
+			socket = new Socket(Inet4Address.getByName(host), port);
+			// socket=SSLSocketFactory.getDefault().createSocket(host, 3333);
 			socket.setSoTimeout(5000);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		try {
-			
-			in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//wenn bis hier alles gut, dann kann die kommunikation beginnen..
-	
-		out.println(">:THIS>:"+nickname);
-		
-		String antwort=null;
-		
+
+		// server sagt nix bis der client seinen usernamen sagt
+
+		out.println(">:THIS>:" + nickname);
+
+		String antwort = null;
+
+		boolean skipToChat = false;
+
 		try {
-			antwort=in.readLine();
+			// entweder antwortet der server mit "user erfolgreich eongeloggt"
+			// oder er antwortet nicht
+			antwort = in.readLine();
+			if (antwort.contains("successfully")) {
+				skipToChat = true;
+				communikation=true;
+			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
-		
+
 		log(antwort);
+
+		if (!skipToChat) {
+			// ggf nochmal den usernamen senden
+			out.println(nickname);
+			try {
+				// hier sollte "you're trying to connect with an ununsual
+				// client"
+				antwort=in.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//username nochmal senden
+			out.println(nickname);
+			
+			//der server müsste sagen das man sich entweder erfolgreich eingeloggt hat oder nicht
+			try {
+				antwort=in.readLine();
+				
+				if(antwort.contains("successfully")){
+					communikation=true;
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 		
-		super.run();
+		
+		
+		if(communikation){
+			
+			outputThread=new OutputStreamThread<>(out, outputQueue);
+			outputThread.start();
+			
+			//ab hier ist man erfolgreich eingeloggt
+			boolean beenden=false;
+			
+			antwort=null;
+			
+			while(!beenden){
+				//lesen bis der client beendet
+				
+				try {
+					antwort=in.readLine();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					antwort=null;
+				}
+				
+				if(antwort!=null){
+					parseNachricht(antwort);
+				}
+				
+			}
+			
+			
+		}
+		
+		
+		
 	}
-	
+	private void parseNachricht(String input){
+		
+	}
+	private void sendeChatnachricht(String chatnachricht){
+		
+		if(out!=null){
+			out.println(chatnachricht);
+		}
+		
+	}
+
 	/**
 	 * Wechselt den in den Raum
+	 * 
 	 * @param raumname
 	 */
-	public void wechsleRaum(String raumname){
-		
+	public void wechsleRaum(String raumname) {
+
 	}
-	
+
 	/**
 	 * Flüstert den entsprechenden user an
+	 * 
 	 * @param name
 	 */
-	public void anfluestern(String name){
-		
+	public void anfluestern(String name) {
+
 	}
-	
+
 	/**
 	 * beendet den flüstermodus
 	 */
-	public void unwhisper(){
-		
-	} 
-	private void log(String log){
-		guiController.log("Server>"+log, 1);
+	public void unwhisper() {
+
 	}
-	public void setUsername(String name){
-		nickname=name;
+
+	private void log(String log) {
+		guiController.log("Server>" + log, 1);
 	}
-	public void closeConnection(){
-		
+
+	public void setUsername(String name) {
+		nickname = name;
 	}
-	
-	
+
+	public void closeConnection() {
+
+		outputThread.stopSend();
+	}
+	public void sendeAnRaum(String nachricht,String raum){
+		outputQueue.add(nachricht);
+	}
+
 }
