@@ -100,7 +100,7 @@ public class MainGuiController implements Initializable{
 		
 	
 		
-		mainz.InitializeServer.main(null);
+//		mainz.InitializeServer.main(null);
 		
 //		instance=this;
 		
@@ -109,24 +109,7 @@ public class MainGuiController implements Initializable{
 //		hcpClient.start();
 //		
 		
-		sendButton.setOnAction(new EventHandler<ActionEvent>() {
-			
-			@Override
-			public void handle(ActionEvent event) {
-				String temp = inputArea.getText();
-				
-//				int beginIndex = temp.indexOf("<>");
-//				String[] blah = temp.split("<>");
-				
-//				hcpClient.sendMessage(blah[1], blah[0]);
-				messageArea.appendText(temp+"\n");
-				
-				inputArea.setText("");
-				
-				client.sendeAnRaum(temp, "1");
-				
-			}
-		});
+		sendButton.setOnAction(ActionEvent -> {sendConsole();});
 		
 		
 		
@@ -156,25 +139,38 @@ public class MainGuiController implements Initializable{
 		
 		
 	}
+	private void sendConsole(){
+		String temp = inputArea.getText();
+		
+//		int beginIndex = temp.indexOf("<>");
+//		String[] blah = temp.split("<>");
+		
+//		hcpClient.sendMessage(blah[1], blah[0]);
+		messageArea.appendText(temp+"\n");
+		
+		inputArea.setText("");
+		
+		client.sendeAnRaum(temp, "1");
+	}
 	private void beenden() {
 		disconnect();
 		System.exit(0);
 		
 	}
 	private void raum1Senden(){
-		if(raum1Besetzt){
+		
 			String nachricht = raum1TF.getText();
 			
 			raum1TF.setText("");
 			
 
-				client.sendeAnRaum(nachricht, "");
+			client.sendeAnRaum(nachricht, "");
 			
 			
 //			hcpClient.sendMessage(nachricht, raum1Name);
 			
 			
-		}
+		
 	}
 	private void raum2Senden(){
 		if(raum2Besetzt){
