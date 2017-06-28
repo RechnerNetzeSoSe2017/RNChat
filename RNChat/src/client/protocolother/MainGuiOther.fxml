@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane prefHeight="591.0" prefWidth="716.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.UIController">
+<AnchorPane prefHeight="591.0" prefWidth="716.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.protocolother.MainGuiController">
    <children>
       <Pane layoutX="-2.0" prefHeight="591.0" prefWidth="716.0">
          <children>

@@ -23,7 +23,7 @@ import server.protokol.OutputStreamThread;
 public class OtherProtocol extends Thread {
 
 	private String host = "127.0.0.1";
-	private int port = 33333;
+	private int port = 3333;
 
 	private String nickname = "";
 

@@ -98,8 +98,10 @@ public class MainGuiController implements Initializable{
 	public void initialize(URL location, ResourceBundle resources) {
 		instance=this;
 		
-		Server ser = new Server();
-		ser.start();
+	
+		
+		mainz.InitializeServer.main(null);
+		
 //		instance=this;
 		
 //		hcpClient=new HCPClient("127.0.0.1", 33333);
