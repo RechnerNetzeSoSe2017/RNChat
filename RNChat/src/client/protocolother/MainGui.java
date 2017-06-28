@@ -11,7 +11,7 @@ public class MainGui extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		try {
-			AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("MainUI.fxml"));
+			AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("MainGuiOther.fxml"));
 //			Scene scene = new Scene(root, 400, 400);
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());

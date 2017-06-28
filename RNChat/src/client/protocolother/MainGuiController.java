@@ -88,7 +88,7 @@ public class MainGuiController implements Initializable{
 	private String raum2Name="";
 	
 	
-	
+	private boolean whisper=false;
 	
 	private OtherProtocol client;
 	
@@ -116,12 +116,14 @@ public class MainGuiController implements Initializable{
 				String temp = inputArea.getText();
 				
 //				int beginIndex = temp.indexOf("<>");
-				String[] blah = temp.split("<>");
+//				String[] blah = temp.split("<>");
 				
 //				hcpClient.sendMessage(blah[1], blah[0]);
-				messageArea.appendText(temp);
+				messageArea.appendText(temp+"\n");
 				
 				inputArea.setText("");
+				
+				client.sendeAnRaum(temp, "1");
 				
 			}
 		});
@@ -165,16 +167,9 @@ public class MainGuiController implements Initializable{
 			
 			raum1TF.setText("");
 			
-			if(nachricht.startsWith("/w")){
-				
-				String[] tmp = nachricht.split(" ");
-				
-				
-				if(tmp.length>=2){
-					client.wechsleRaum(tmp[1]);
-				}
-				
-			}
+
+				client.sendeAnRaum(nachricht, "");
+			
 			
 //			hcpClient.sendMessage(nachricht, raum1Name);
 			
@@ -220,9 +215,13 @@ public class MainGuiController implements Initializable{
 //		
 		String name = raumlisteLV.getSelectionModel().getSelectedItem();
 		
-		
-		client.wechsleRaum(name);
 		raum1TA.clear();
+		client.wechsleRaum(name);
+		
+		
+		
+//		client.wechsleRaum(name);
+		
 //		if(name!=null){
 //			hcpClient.subscribe(name);
 //			
@@ -329,15 +328,12 @@ public class MainGuiController implements Initializable{
 		
 		if(raumname != null && nickname != null){
 			
-			if(raumname.equals(raum1Name)){
+			
 				
 				raum1LV.getItems().add(nickname);
 				
 				
-			}else if(raumname.equals(raum2Name)){
-				
-				raum2LV.getItems().add(nickname);
-			}
+			
 			
 		}
 		

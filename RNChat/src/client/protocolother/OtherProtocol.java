@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -44,7 +45,8 @@ public class OtherProtocol extends Thread {
 
 	private MainGuiController guiController = null;
 	
-	
+	private boolean whisper=false;
+	private boolean changeRoom=false;
 
 	public OtherProtocol(String host) {
 		this.host = host;
@@ -77,6 +79,15 @@ public class OtherProtocol extends Thread {
 			e.printStackTrace();
 		}
 
+		
+		
+//		try {
+//			log(in.readLine());
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
 		// server sagt nix bis der client seinen usernamen sagt
 
 		out.println(">:THIS>:" + nickname);
@@ -89,6 +100,9 @@ public class OtherProtocol extends Thread {
 			// entweder antwortet der server mit "user erfolgreich eongeloggt"
 			// oder er antwortet nicht
 			antwort = in.readLine();
+			
+			log(antwort);
+			
 			if (antwort.contains("successfully")) {
 				skipToChat = true;
 				communikation=true;
@@ -107,35 +121,39 @@ public class OtherProtocol extends Thread {
 				// hier sollte "you're trying to connect with an ununsual
 				// client"
 				antwort=in.readLine();
+				log(antwort+"| skiptoChat");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 			//username nochmal senden
-			out.println(nickname);
+//			out.println(nickname);
+//			guiController.log("client>"+nickname, 1);
 			
 			//der server müsste sagen das man sich entweder erfolgreich eingeloggt hat oder nicht
+			
+			
+			
+			
+//			//timeout wieder auf 0 setzen
 			try {
-				antwort=in.readLine();
-				
-				if(antwort.contains("successfully")){
-					communikation=true;
-				}
-				
-			} catch (IOException e) {
+				socket.setSoTimeout(0);
+			} catch (SocketException e1) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e1.printStackTrace();
 			}
+			
+
 			
 		}
 		
 		
 		
-		if(communikation){
+		
 			
-			outputThread=new OutputStreamThread<>(out, outputQueue);
-			outputThread.start();
+//			outputThread=new OutputStreamThread<>(out, outputQueue);
+//			outputThread.start();
 			
 			//ab hier ist man erfolgreich eingeloggt
 			boolean beenden=false;
@@ -144,12 +162,39 @@ public class OtherProtocol extends Thread {
 			
 			
 			//hier die Raumliste holen und dann channellist(String) mit jedem namen aufrufen
+			out.println("SHOWROOMS:>");
+			
+			
+			try {
+				//raumliste verarbeiten
+				antwort=in.readLine();
+				
+				log(antwort);
+				setRaeume(antwort);
+				
+				
+				sendeAnRaum("USERS:>", "");
+				
+				antwort=in.readLine();
+				log(antwort);
+				
+				setUsers(antwort);
+				
+				
+				
+				
+				
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			while(!beenden){
 				//lesen bis der client beendet
 				
 				try {
 					antwort=in.readLine();
+					log(antwort);
 				} catch (IOException e) {
 					
 					e.printStackTrace();
@@ -163,10 +208,27 @@ public class OtherProtocol extends Thread {
 			}
 			
 			
+		
+		
+		
+		
+	}
+	private void setRaeume(String raeume){
+		String[] tmp = raeume.split(" \\| ");
+		for(String elem : tmp){
+			if(!elem.equals("")){
+				guiController.addToChannellist(elem);
+			}
 		}
-		
-		
-		
+	}
+	private void setUsers(String usernamen){
+		String[] tmp = usernamen.split(" \\| ");
+		for(String elem : tmp){
+			if(!elem.equals("")){
+				
+				guiController.addNickToNicklist("lobby", elem);
+			}
+		}
 	}
 	/**
 	 * parst die ankommende Nachricht
@@ -174,7 +236,13 @@ public class OtherProtocol extends Thread {
 	 */
 	private void parseNachricht(String input){
 		
-		guiController.messageToChat("", "", input);
+		if(!changeRoom){
+			guiController.messageToChat("", "", input);
+		}else{
+			if(input.contains("\\|")){
+				setUsers(input);
+			}
+		}
 		
 		
 	}
@@ -202,9 +270,14 @@ public class OtherProtocol extends Thread {
 	 */
 	public void wechsleRaum(String raumname) {
 
-		outputQueue.add("JOIN:>"+raumname);
+		out.println("JOIN:>"+raumname);
+//		outputQueue.add("JOIN:>"+raumname);
+		changeRoom=true;
+		out.println("USERS:>");
 		
 	}
+	
+
 
 	/**
 	 * Flüstert den entsprechenden user an
@@ -213,6 +286,8 @@ public class OtherProtocol extends Thread {
 	 */
 	public void anfluestern(String name) {
 
+		out.println("WHISPER:>"+name);
+		
 	}
 
 	/**
@@ -232,10 +307,24 @@ public class OtherProtocol extends Thread {
 
 	public void closeConnection() {
 
-		outputThread.stopSend();
+//		outputThread.stopSend();
 	}
 	public void sendeAnRaum(String nachricht,String raum){
-		outputQueue.add(nachricht);
+		
+		if(nachricht.contains("/w")){
+			
+			String[] tmp = nachricht.split(" ");
+			
+			if(tmp.length>1){
+				out.println("WHISPER:>"+tmp[1]);
+			}else{
+				out.println("UNWHISPER:>");
+			}
+			
+		}
+		
+		out.println(nachricht);
+//		outputQueue.add(nachricht);
 	}
 
 }
