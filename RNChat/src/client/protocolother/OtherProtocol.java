@@ -10,6 +10,11 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
 import server.protokol.InputStreamThread;
@@ -36,11 +41,13 @@ public class OtherProtocol extends Thread{
 
 	private HashMap<String, TextArea> chatraumFenster = new HashMap<>();
 	private HashMap<String, ObservableList> nicknameFenster = new HashMap<>();
-	
+
+
+	private MainGuiController guiController=null;
 	
 	public OtherProtocol(String host) {
 		this.host=host;
-		
+		guiController=MainGuiController.getInstance();
 		
 	}
 	
@@ -51,7 +58,9 @@ public class OtherProtocol extends Thread{
 		socket=null;
 		
 		try {
-			socket= new Socket(Inet4Address.getByName(host), port);
+//			socket= new Socket(Inet4Address.getByName(host), port);
+			socket=SSLSocketFactory.getDefault().createSocket(host, 3333);
+			socket.setSoTimeout(5000);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -59,6 +68,7 @@ public class OtherProtocol extends Thread{
 		
 		
 		try {
+			
 			in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 		} catch (IOException e) {
@@ -68,6 +78,18 @@ public class OtherProtocol extends Thread{
 		
 		//wenn bis hier alles gut, dann kann die kommunikation beginnen..
 	
+		out.println(">:THIS>:"+nickname);
+		
+		String antwort=null;
+		
+		try {
+			antwort=in.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		log(antwort);
 		
 		super.run();
 	}
@@ -94,6 +116,15 @@ public class OtherProtocol extends Thread{
 	public void unwhisper(){
 		
 	} 
+	private void log(String log){
+		guiController.log("Server>"+log, 1);
+	}
+	public void setUsername(String name){
+		nickname=name;
+	}
+	public void closeConnection(){
+		
+	}
 	
 	
 }

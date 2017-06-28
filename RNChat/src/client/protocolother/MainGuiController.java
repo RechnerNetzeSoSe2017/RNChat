@@ -89,13 +89,13 @@ public class MainGuiController implements Initializable{
 	
 	
 	
-	private HCPClient hcpClient;
+	private OtherProtocol client;
 	
-	private static UIController instance=null;
+	private static MainGuiController instance=null;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+		instance=this;
 		
 		
 //		instance=this;
@@ -114,7 +114,7 @@ public class MainGuiController implements Initializable{
 //				int beginIndex = temp.indexOf("<>");
 				String[] blah = temp.split("<>");
 				
-				hcpClient.sendMessage(blah[1], blah[0]);
+//				hcpClient.sendMessage(blah[1], blah[0]);
 				messageArea.appendText(temp);
 				
 				inputArea.setText("");
@@ -161,7 +161,7 @@ public class MainGuiController implements Initializable{
 			
 			raum1TF.setText("");
 			
-			hcpClient.sendMessage(nachricht, raum1Name);
+//			hcpClient.sendMessage(nachricht, raum1Name);
 			
 			
 		}
@@ -173,7 +173,7 @@ public class MainGuiController implements Initializable{
 			
 			raum2TF.setText("");
 			
-			hcpClient.sendMessage(nachricht, raum2Name);
+//			hcpClient.sendMessage(nachricht, raum2Name);
 			
 			}
 	}
@@ -191,7 +191,7 @@ public class MainGuiController implements Initializable{
 				raum2Besetzt=false;
 				
 			}
-			hcpClient.unsubscribe(name);
+//			hcpClient.unsubscribe(name);
 			
 			if(!raum1Besetzt || !raum2Besetzt){
 				joinB.setDisable(false);
@@ -202,34 +202,34 @@ public class MainGuiController implements Initializable{
 	}
 	private void abboniereChannel() {
 		
-		
-		String name = raumlisteLV.getSelectionModel().getSelectedItem();
-		if(name!=null){
-			hcpClient.subscribe(name);
-			
-			if(!raum1Besetzt){
-				raum1TA.clear();
-				hcpClient.setTextareaForRoom(name, raum1TA);
-				raum1LV.getItems().clear();
-//				raum1LV.getItems().add(hcpClient.getNick());
-				hcpClient.setListViewForNicklist(name, raum1LV.getItems());
-				raum1Name=name;
-				raum1Besetzt=true;
-			}else if(!raum2Besetzt){
-				raum2TA.clear();
-				hcpClient.setTextareaForRoom(name, raum2TA);
-				raum2LV.getItems().clear();
-//				raum2LV.getItems().add(hcpClient.getNick());
-				hcpClient.setListViewForNicklist(name, raum2LV.getItems());
-				raum2Name=name;
-				raum2Besetzt=true;
-			}
-			
-			if(raum1Besetzt && raum2Besetzt){
-				joinB.setDisable(true);
-			}
-			
-		}
+//		
+//		String name = raumlisteLV.getSelectionModel().getSelectedItem();
+//		if(name!=null){
+//			hcpClient.subscribe(name);
+//			
+//			if(!raum1Besetzt){
+//				raum1TA.clear();
+//				hcpClient.setTextareaForRoom(name, raum1TA);
+//				raum1LV.getItems().clear();
+////				raum1LV.getItems().add(hcpClient.getNick());
+//				hcpClient.setListViewForNicklist(name, raum1LV.getItems());
+//				raum1Name=name;
+//				raum1Besetzt=true;
+//			}else if(!raum2Besetzt){
+//				raum2TA.clear();
+//				hcpClient.setTextareaForRoom(name, raum2TA);
+//				raum2LV.getItems().clear();
+////				raum2LV.getItems().add(hcpClient.getNick());
+//				hcpClient.setListViewForNicklist(name, raum2LV.getItems());
+//				raum2Name=name;
+//				raum2Besetzt=true;
+//			}
+//			
+//			if(raum1Besetzt && raum2Besetzt){
+//				joinB.setDisable(true);
+//			}
+//			
+//		}
 		
 		
 	}
@@ -238,7 +238,7 @@ public class MainGuiController implements Initializable{
 	 * Gibt diese Instanz des Controllers zurück --> Singelton-Pattern
 	 * @return
 	 */
-	public static UIController getInstance(){
+	public static MainGuiController getInstance(){
 		return instance;
 	}
 	/**
@@ -246,7 +246,7 @@ public class MainGuiController implements Initializable{
 	 * @param message
 	 * @param id
 	 */
-	public void message(String message, int id){
+	public void log(String message, int id){
 		
 		messageArea.appendText(message+"\n");
 		
@@ -288,12 +288,12 @@ public class MainGuiController implements Initializable{
 		String nickname = nicknameTF.getText();
 		
 		if(!ip.equals("") && !nickname.equals("")){
-			hcpClient=new HCPClient(ip, 33333);
-			hcpClient.setNickname(nickname);
+			client=new OtherProtocol(ip);
+			client.setUsername(nickname);
 			raumlisteLV.getItems().clear();
-			hcpClient.setRoomlist(raumlisteLV.getItems());
+//			hcpClient.setRoomlist(raumlisteLV.getItems());
 			
-			hcpClient.start();
+			client.start();
 			disconnectB.setDisable(false);
 			connectB.setDisable(true);
 		}
@@ -352,7 +352,7 @@ public class MainGuiController implements Initializable{
 	}
 	private void disconnect(){
 		
-		hcpClient.closeConnection();
+		client.closeConnection();
 		disconnectB.setDisable(true);
 		connectB.setDisable(false);
 	}
