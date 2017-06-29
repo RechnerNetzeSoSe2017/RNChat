@@ -314,6 +314,7 @@ public class OtherProtocol extends Thread {
 
 	public void closeConnection() {
 
+		out.println("LOGOUT:>");
 		outputThread.stopSend();
 	}
 	public void sendeAnRaum(String nachricht,String raum){

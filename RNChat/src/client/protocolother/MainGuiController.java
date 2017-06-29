@@ -212,6 +212,7 @@ public class MainGuiController implements Initializable{
 		String name = raumlisteLV.getSelectionModel().getSelectedItem();
 		
 		raum1TA.clear();
+		raum1LV.getSelectionModel().getSelectedItems().clear();
 		client.wechsleRaum(name);
 		
 		
