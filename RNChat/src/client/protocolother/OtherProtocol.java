@@ -248,6 +248,7 @@ public class OtherProtocol extends Thread {
 			if(input.contains("\\|")){
 				setUsers(input);
 			}
+			changeRoom=false;
 		}
 		
 		
