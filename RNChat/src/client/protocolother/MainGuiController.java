@@ -100,7 +100,7 @@ public class MainGuiController implements Initializable{
 		
 	
 		
-//		mainz.InitializeServer.main(null);
+		mainz.InitializeServer.main("");
 		
 //		instance=this;
 		

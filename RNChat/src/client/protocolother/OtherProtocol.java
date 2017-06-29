@@ -152,8 +152,8 @@ public class OtherProtocol extends Thread {
 		
 		
 			
-//			outputThread=new OutputStreamThread<>(out, outputQueue);
-//			outputThread.start();
+			outputThread=new OutputStreamThread<>(out, outputQueue);
+			outputThread.start();
 			
 			//ab hier ist man erfolgreich eingeloggt
 			boolean beenden=false;
@@ -215,19 +215,25 @@ public class OtherProtocol extends Thread {
 	}
 	private void setRaeume(String raeume){
 		String[] tmp = raeume.split(" \\| ");
+		
+		if(tmp.length>1){
 		for(String elem : tmp){
 			if(!elem.equals("")){
 				guiController.addToChannellist(elem);
 			}
 		}
+		}
 	}
 	private void setUsers(String usernamen){
 		String[] tmp = usernamen.split(" \\| ");
+		
+		if(tmp.length>1){
 		for(String elem : tmp){
 			if(!elem.equals("")){
 				
 				guiController.addNickToNicklist("lobby", elem);
 			}
+		}
 		}
 	}
 	/**
@@ -307,7 +313,7 @@ public class OtherProtocol extends Thread {
 
 	public void closeConnection() {
 
-//		outputThread.stopSend();
+		outputThread.stopSend();
 	}
 	public void sendeAnRaum(String nachricht,String raum){
 		
